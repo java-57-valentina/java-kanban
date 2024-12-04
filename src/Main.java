@@ -28,7 +28,8 @@ public class Main {
         printSubtasks(manager);
 
         System.out.println("\nИзменение статусов задач ...");
-        // make a copy to avoid a modification of data inside the manager
+        /* Создаем клоны существующих объектов и модифицируем их
+        иначе методы менеджера теряют смысл */
         task1 = new Task(task1);
         task2 = new Task(task2);
         task1.setStatus(Status.IN_PROGRESS);

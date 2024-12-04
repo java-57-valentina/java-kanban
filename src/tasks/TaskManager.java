@@ -192,7 +192,7 @@ public class TaskManager {
 
         final Subtask oldValue = subtasks.get(id);
         if (oldValue == null) {
-            return null; // use 'addSubtask' to create subtask
+            return null;
         }
 
         /* We ignore the change of 'epicId' in subtask.
