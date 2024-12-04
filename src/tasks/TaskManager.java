@@ -22,7 +22,6 @@ public class TaskManager {
             return null;
         task.setId(counter.nextValue());
         tasks.put(task.getId(), task);
-        System.out.println("addTask: " + task);
         return task;
     }
 
@@ -33,7 +32,6 @@ public class TaskManager {
         epic.removeAllSubtasks(); // для консистентности
         updateEpicStatus(epic);
         epics.put(epic.getId(), epic);
-        System.out.println("addEpic: " + epic);
         return epic;
     }
 
@@ -49,7 +47,6 @@ public class TaskManager {
         subtasks.put(subtask.getId(), subtask);
         epic.addSubtask(subtask.getId());
         updateEpicStatus(epic);
-        System.out.println("addSubtask " + subtask);
         return subtask;
     }
 
@@ -167,7 +164,12 @@ public class TaskManager {
         if (old == null)
             return null;
 
-        /* We don't update list of subtasks in epic
+        if (epic.equals(old)) {
+            System.out.println("Эпики совпадают");
+            return old;
+        }
+
+        /* We don't update epic's list of subtasks
         all changes in subtasks must be using addSubtask/removeSubtask */
         epic.removeAllSubtasks();
         for (int id : old.getSubtasks())
@@ -183,13 +185,20 @@ public class TaskManager {
             return null;
 
         final int id = subtask.getId();
+        if (subtask.equals(subtasks.get(id))) {
+            System.out.println("Подзадачи совпадают");
+            return subtasks.get(id);
+        }
+
         final Subtask oldValue = subtasks.get(id);
         if (oldValue == null) {
             return null; // use 'addSubtask' to create subtask
         }
 
+        /* We ignore the change of 'epicId' in subtask.
+        use addSubtask/removeSubtask to change epic of subtask */
         if (subtask.getEpicId() != oldValue.getEpicId()) {
-            subtask.setEpicId(oldValue.getEpicId()); // use 'addSubtask/removeSubtask' to change epic of subtask
+            subtask.setEpicId(oldValue.getEpicId());
         }
 
         subtasks.replace(id, subtask);

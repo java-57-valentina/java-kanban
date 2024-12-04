@@ -1,10 +1,5 @@
 import tasks.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -35,7 +30,8 @@ public class Main {
 
         System.out.println("\nИзменение статусов задач ...");
 
-        task1 = new Task(task1); // make a copy to avoid a modification of data inside the manager
+        // make a copy to avoid a modification of data inside the manager
+        task1 = new Task(task1);
         task2 = new Task(task2);
         task1.setStatus(Status.IN_PROGRESS);
         task2.setStatus(Status.DONE);
@@ -47,7 +43,7 @@ public class Main {
 
         System.out.println("\nИзменение статусов эпиков ...");
 
-        epic1 = new Epic(epic1); // make a copy to avoid a modification of data inside the manager
+        epic1 = new Epic(epic1);
         epic2 = new Epic(epic2);
         epic1.setStatus(Status.IN_PROGRESS);
         epic2.setStatus(Status.DONE);
@@ -60,7 +56,7 @@ public class Main {
 
         System.out.println("\nИзменение статусов подзадач ...");
 
-        subtask1 = new Subtask(subtask1); // make a copy to avoid a modification of data inside the manager
+        subtask1 = new Subtask(subtask1);
         subtask2 = new Subtask(subtask2);
         subtask3 = new Subtask(subtask3);
         subtask1.setStatus(Status.IN_PROGRESS);
