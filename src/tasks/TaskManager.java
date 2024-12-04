@@ -17,7 +17,6 @@ public class TaskManager {
     }
 
 
-    @SuppressWarnings("UnusedReturnValue")
     public Task addTask(Task task) {
         if (task == null)
             return null;
@@ -27,7 +26,6 @@ public class TaskManager {
         return task;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public Epic addEpic(Epic epic) {
         if (epic == null)
             return null;
@@ -39,7 +37,6 @@ public class TaskManager {
         return epic;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public Subtask addSubtask(Subtask subtask) {
         if (subtask == null)
             return null;
@@ -69,39 +66,32 @@ public class TaskManager {
         return subtasks.get(id);
     }
 
-    @SuppressWarnings("unused")
     public List<Task> getTasks() {
         return tasks.values().stream().toList();
     }
 
-    @SuppressWarnings("unused")
     public List<Epic> getEpics() {
         return epics.values().stream().toList();
     }
     
-    @SuppressWarnings("unused")
     public List<Subtask> getSubtasks() {
         return subtasks.values().stream().toList();
     }
     
-    @SuppressWarnings("unused")
     public List<Subtask> getSubtasksByEpicId(int epicId) {
         return subtasks.values().stream().filter(c -> c.getEpicId() == epicId).collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unused")
     public List<Subtask> getSubtasksByEpic(Epic epic) {
         if (epic == null)
             return null;
         return getSubtasksByEpicId(epic.getId());
-
     }
 
 
     public Status getTaskStatus(int id) {
         Task item = tasks.get(id);
         return (item != null) ? item.getStatus() : Status.UNDEFINED;
-
     }
     public Status getEpicStatus(int id) {
         Task item = epics.get(id);
@@ -171,7 +161,6 @@ public class TaskManager {
     }
 
 
-    @SuppressWarnings("UnusedReturnValue")
     public Task updateTask(Task task) {
         if (tasks.replace(task.getId(), task) == null) {
             return null;
@@ -179,7 +168,6 @@ public class TaskManager {
         return task; // return object in actual state
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public Epic updateEpic(Epic epic) {
         if (epic == null)
             return null;
@@ -199,7 +187,6 @@ public class TaskManager {
         return epic;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public Subtask updateSubtask(Subtask subtask) {
         if (subtask == null)
             return null;
@@ -217,7 +204,6 @@ public class TaskManager {
         subtasks.replace(id, subtask);
         updateEpicStatus(getEpic(subtask.getEpicId()));
         return subtask; // return object in actual state
-
     }
 
 
