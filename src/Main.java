@@ -6,7 +6,6 @@ public class Main {
         TaskManager manager = new TaskManager();
 
         System.out.println("Создание объектов ...");
-
         Task task1 = new Task("Выгулять собаку", "взять с собой лакомства и пакетики", Status.NEW);
         Task task2 = new Task("Покормить собаку", "и угостить запеканкой", Status.NEW);
         task1 = manager.addTask(task1);
@@ -29,7 +28,6 @@ public class Main {
         printSubtasks(manager);
 
         System.out.println("\nИзменение статусов задач ...");
-
         // make a copy to avoid a modification of data inside the manager
         task1 = new Task(task1);
         task2 = new Task(task2);
@@ -38,11 +36,9 @@ public class Main {
 
         manager.updateTask(task1);
         manager.updateTask(task2);
-
         printTasks(manager);
 
         System.out.println("\nИзменение статусов эпиков ...");
-
         epic1 = new Epic(epic1);
         epic2 = new Epic(epic2);
         epic1.setStatus(Status.IN_PROGRESS);
@@ -51,11 +47,9 @@ public class Main {
         // expected behavior: the statuses will not be changed
         manager.updateEpic(epic1);
         manager.updateEpic(epic2);
-
         printEpics(manager);
 
         System.out.println("\nИзменение статусов подзадач ...");
-
         subtask1 = new Subtask(subtask1);
         subtask2 = new Subtask(subtask2);
         subtask3 = new Subtask(subtask3);
@@ -66,17 +60,14 @@ public class Main {
         manager.updateSubtask(subtask1);
         manager.updateSubtask(subtask2);
         manager.updateSubtask(subtask3);
-
         printEpics(manager);
         printSubtasks(manager);
 
         System.out.println("\nУдаление задачи id:" + task1.getId() + " ...");
-
         manager.removeTask(task1.getId());
         printTasks(manager);
 
         System.out.println("\nУдаление эпика id:" + epic1.getId() + " ...");
-
         manager.removeEpic(epic1.getId());
         printEpics(manager);
         printSubtasks(manager);
