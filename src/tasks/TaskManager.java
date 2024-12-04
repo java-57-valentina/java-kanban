@@ -128,16 +128,7 @@ public class TaskManager {
 
 
     public Task removeTask(int id) {
-        System.out.println("try remove task #" + id);
-        if (tasks.containsKey(id))
-            System.out.println("contains .");
-
-        Task result = tasks.remove(id);
-
-        if (tasks.containsKey(id))
-            System.out.println("contains ..");
-
-        return result;
+        return tasks.remove(id);
     }
 
     public Epic removeEpic(int id) {
@@ -214,7 +205,7 @@ public class TaskManager {
 
         final Status firstSubtaskStatus = getSubtaskStatus(epic.getSubtasks().iterator().next());
         if (firstSubtaskStatus == Status.IN_PROGRESS) {
-            return firstSubtaskStatus;
+            return Status.IN_PROGRESS;
         }
         for (int id : epic.getSubtasks()) {
             if (getSubtaskStatus(id) != firstSubtaskStatus) {
