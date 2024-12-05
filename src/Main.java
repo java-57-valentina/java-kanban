@@ -72,6 +72,17 @@ public class Main {
         manager.removeEpic(epic1.getId());
         printEpics(manager);
         printSubtasks(manager);
+
+        System.out.println("\nДобавление подзадачи ...");
+        Subtask subtask4 = new Subtask("Закоммитить изменения", "в гитхаб", Status.NEW, epic2.getId());
+        subtask4 = manager.addSubtask(subtask4);
+        printEpics(manager);
+        printSubtasks(manager);
+
+        System.out.println("\nУдаление всех эпиков ...");
+        manager.removeAllEpics();
+        printEpics(manager);
+        printSubtasks(manager);
     }
 
     private static void printTasks(TaskManager manager) {
