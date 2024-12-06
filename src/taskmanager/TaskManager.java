@@ -1,4 +1,9 @@
-package tasks;
+package taskmanager;
+
+import tasks.Epic;
+import tasks.Status;
+import tasks.Subtask;
+import tasks.Task;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,7 +35,7 @@ public class TaskManager {
             return null;
         epic.setId(counter.nextValue());
         epic.removeAllSubtasks(); // для консистентности
-        updateEpicStatus(epic);
+        epic.setStatus(Status.NEW);
         epics.put(epic.getId(), epic);
         return epic;
     }
@@ -77,12 +82,6 @@ public class TaskManager {
     
     public List<Subtask> getSubtasksByEpicId(int epicId) {
         return subtasks.values().stream().filter(c -> c.getEpicId() == epicId).collect(Collectors.toList());
-    }
-
-    public List<Subtask> getSubtasksByEpic(Epic epic) {
-        if (epic == null)
-            return null;
-        return getSubtasksByEpicId(epic.getId());
     }
 
 
@@ -165,7 +164,6 @@ public class TaskManager {
             return null;
 
         if (epic.equals(old)) {
-            System.out.println("Эпики совпадают");
             return old;
         }
 
@@ -186,7 +184,6 @@ public class TaskManager {
 
         final int id = subtask.getId();
         if (subtask.equals(subtasks.get(id))) {
-            System.out.println("Подзадачи совпадают");
             return subtasks.get(id);
         }
 
@@ -207,7 +204,7 @@ public class TaskManager {
     }
 
 
-    protected Status calculateEpicStatus(Epic epic) {
+    private Status calculateEpicStatus(Epic epic) {
         if (epic.getSubtasks().isEmpty()) {
             return Status.NEW;
         }
@@ -229,10 +226,3 @@ public class TaskManager {
     }
 }
 
-class Counter {
-    private int value = 0;
-    
-    public int nextValue() {
-        return ++value;
-    }
-}

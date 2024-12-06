@@ -6,13 +6,13 @@ import java.util.Objects;
 public class Epic extends Task {
     private final HashSet<Integer> subtasks;
 
-    public Epic(int id, String name, String description, Status status) {
-        super(id, name, description, status);
+    public Epic(int id, String name, String description) {
+        super(id, name, description, Status.NEW);
         subtasks = new HashSet<>();
     }
 
-    public Epic(String name, String description, Status status) {
-        this(0, name, description,status);
+    public Epic(String name, String description) {
+        this(0, name, description);
     }
 
     public Epic(Epic prototype) {

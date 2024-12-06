@@ -1,3 +1,4 @@
+import taskmanager.TaskManager;
 import tasks.*;
 
 public class Main {
@@ -11,8 +12,8 @@ public class Main {
         task1 = manager.addTask(task1);
         task2 = manager.addTask(task2);
 
-        Epic epic1 = new Epic("Убраться на столе", "на рабочем", Status.NEW);
-        Epic epic2 = new Epic("Выполнить проект №4", "качественно", Status.NEW);
+        Epic epic1 = new Epic("Убраться на столе", "на рабочем");
+        Epic epic2 = new Epic("Выполнить проект №4", "качественно");
         epic1 = manager.addEpic(epic1);
         epic2 = manager.addEpic(epic2);
 
