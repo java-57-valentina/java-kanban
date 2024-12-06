@@ -192,8 +192,8 @@ public class TaskManager {
             return null;
         }
 
-        /* We ignore the change of 'epicId' in subtask.
-        use addSubtask/removeSubtask to change epic of subtask */
+        /* Мы не обрабатываем ситуацию, когда у подзадачи меняется родительский эпик.
+        Обновляем все остальные данные, а id эпика остается прежним */
         if (subtask.getEpicId() != oldValue.getEpicId()) {
             subtask.setEpicId(oldValue.getEpicId());
         }
