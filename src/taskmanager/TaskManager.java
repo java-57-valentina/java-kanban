@@ -9,13 +9,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TaskManager {
-    Counter counter;
+    private int uniqueId = 0;
     private final HashMap<Integer, Task> tasks;
     private final HashMap<Integer, Epic> epics;
     private final HashMap<Integer, Subtask> subtasks;
 
     public TaskManager() {
-        counter = new Counter();
+        uniqueId = 0;
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
@@ -25,7 +25,7 @@ public class TaskManager {
     public Task addTask(Task task) {
         if (task == null)
             return null;
-        task.setId(counter.nextValue());
+        task.setId(nextId());
         tasks.put(task.getId(), task);
         return task;
     }
@@ -33,7 +33,7 @@ public class TaskManager {
     public Epic addEpic(Epic epic) {
         if (epic == null)
             return null;
-        epic.setId(counter.nextValue());
+        epic.setId(nextId());
         epic.removeAllSubtasks(); // для консистентности
         epic.setStatus(Status.NEW);
         epics.put(epic.getId(), epic);
@@ -48,7 +48,7 @@ public class TaskManager {
         if (epic == null)
             return null;
 
-        subtask.setId(counter.nextValue());
+        subtask.setId(nextId());
         subtasks.put(subtask.getId(), subtask);
         epic.addSubtask(subtask.getId());
         updateEpicStatus(epic);
@@ -224,5 +224,8 @@ public class TaskManager {
     protected void updateEpicStatus(Epic epic) {
         epic.setStatus(calculateEpicStatus(epic));
     }
-}
 
+    private int nextId() {
+        return ++uniqueId;
+    }
+}
