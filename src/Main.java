@@ -1,10 +1,11 @@
+import taskmanager.InMemoryTaskManager;
 import taskmanager.TaskManager;
 import tasks.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new InMemoryTaskManager();
 
         System.out.println("Создание объектов ...");
         Task task1 = new Task("Выгулять собаку", "взять с собой лакомства и пакетики", Status.NEW);
