@@ -5,6 +5,7 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
@@ -56,4 +57,7 @@ public interface TaskManager {
     Epic updateEpic(Epic epic);
 
     Subtask updateSubtask(Subtask subtask);
+
+
+    List<Task> getHistory();
 }

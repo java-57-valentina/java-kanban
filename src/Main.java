@@ -2,6 +2,9 @@ import taskmanager.InMemoryTaskManager;
 import taskmanager.TaskManager;
 import tasks.*;
 
+import java.util.List;
+import java.util.Random;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -12,6 +15,8 @@ public class Main {
         Task task2 = new Task("Покормить собаку", "и угостить запеканкой", Status.NEW);
         task1 = manager.addTask(task1);
         task2 = manager.addTask(task2);
+
+        manager.addTask(new Task("Купить подарки друзьям", "", Status.NEW));
 
         Epic epic1 = new Epic("Убраться на столе", "на рабочем");
         Epic epic2 = new Epic("Выполнить проект №4", "качественно");
@@ -25,9 +30,9 @@ public class Main {
         subtask2 = manager.addSubtask(subtask2);
         subtask3 = manager.addSubtask(subtask3);
 
-        printTasks(manager);
-        printEpics(manager);
-        printSubtasks(manager);
+        printTasks(manager.getTasks(), "Задачи");
+        printTasks(manager.getEpics(), "Эпики");
+        printTasks(manager.getSubtasks(), "Подзадачи");
 
         System.out.println("\nИзменение статусов задач ...");
         /* Создаем клоны существующих объектов и модифицируем их
@@ -39,7 +44,7 @@ public class Main {
 
         manager.updateTask(task1);
         manager.updateTask(task2);
-        printTasks(manager);
+        printTasks(manager.getTasks(), "Задачи");
 
         System.out.println("\nИзменение статусов эпиков ...");
         epic1 = new Epic(epic1);
@@ -50,7 +55,7 @@ public class Main {
         // expected behavior: the statuses will not be changed
         manager.updateEpic(epic1);
         manager.updateEpic(epic2);
-        printEpics(manager);
+        printTasks(manager.getEpics(), "Эпики");
 
         System.out.println("\nИзменение статусов подзадач ...");
         subtask1 = new Subtask(subtask1);
@@ -63,48 +68,55 @@ public class Main {
         manager.updateSubtask(subtask1);
         manager.updateSubtask(subtask2);
         manager.updateSubtask(subtask3);
-        printEpics(manager);
-        printSubtasks(manager);
+        printTasks(manager.getEpics(), "Эпики");
+        printTasks(manager.getSubtasks(), "Подзадачи");
 
         System.out.println("\nУдаление задачи id:" + task1.getId() + " ...");
         manager.removeTask(task1.getId());
-        printTasks(manager);
+        printTasks(manager.getTasks(), "Задачи");
 
         System.out.println("\nУдаление эпика id:" + epic1.getId() + " ...");
         manager.removeEpic(epic1.getId());
-        printEpics(manager);
-        printSubtasks(manager);
+        printTasks(manager.getEpics(), "Эпики");
+        printTasks(manager.getSubtasks(), "Подзадачи");
 
         System.out.println("\nДобавление подзадачи ...");
         Subtask subtask4 = new Subtask("Закоммитить изменения", "в гитхаб", Status.NEW, epic2.getId());
         subtask4 = manager.addSubtask(subtask4);
-        printEpics(manager);
-        printSubtasks(manager);
+        printTasks(manager.getEpics(), "Эпики");
+        printTasks(manager.getSubtasks(), "Подзадачи");
 
         System.out.println("\nУдаление всех эпиков ...");
         manager.removeAllEpics();
-        printEpics(manager);
-        printSubtasks(manager);
+        printTasks(manager.getEpics(), "Эпики");
+        printTasks(manager.getSubtasks(), "Подзадачи");
+
+        System.out.println("\nОтображение истории просмотра ...");
+        printTasks(manager.getHistory(), "История");
+
+        System.out.println("\nПросмотр всех задач ...");
+        for (Task task : manager.getTasks()) {
+            System.out.println(manager.getTask(task.getId()));
+        }
+
+        System.out.println("\nОтображение истории просмотра ...");
+        printTasks(manager.getHistory(), "История");
+
+        System.out.println("\nУдаление рандомной таски ...");
+        Random random = new Random();
+        int idx = random.nextInt(manager.getTasks().size());
+        Task rndTask = manager.getTasks().get(idx);
+        System.out.println(rndTask);
+        manager.removeTask(rndTask.getId());
+
+        System.out.println("\nПовторное отображение истории просмотра ...");
+        printTasks(manager.getHistory(), "История");
     }
 
-    private static void printTasks(TaskManager manager) {
+    private static void printTasks(List<? extends Task> list, String title) {
         System.out.println();
-        System.out.println("Задачи:");
-        for (Task task : manager.getTasks())
-            System.out.println(task);
-    }
-
-    private static void printEpics(TaskManager manager) {
-        System.out.println();
-        System.out.println("Эпики:");
-        for (Epic task : manager.getEpics())
-            System.out.println(task);
-    }
-
-    private static void printSubtasks(TaskManager manager) {
-        System.out.println();
-        System.out.println("Подзадачи:");
-        for (Subtask task : manager.getSubtasks())
+        System.out.println(title + ":");
+        for (Task task : list)
             System.out.println(task);
     }
 }
