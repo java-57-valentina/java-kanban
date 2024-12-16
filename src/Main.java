@@ -1,6 +1,9 @@
-import taskmanager.InMemoryTaskManager;
+import taskmanager.Managers;
 import taskmanager.TaskManager;
-import tasks.*;
+import tasks.Epic;
+import tasks.Status;
+import tasks.Subtask;
+import tasks.Task;
 
 import java.util.List;
 import java.util.Random;
@@ -8,7 +11,7 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager manager = new InMemoryTaskManager();
+        TaskManager manager = Managers.getDefault();
 
         System.out.println("Создание объектов ...");
         Task task1 = new Task("Выгулять собаку", "взять с собой лакомства и пакетики", Status.NEW);
