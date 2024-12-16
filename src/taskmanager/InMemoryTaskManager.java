@@ -277,14 +277,15 @@ public class InMemoryTaskManager implements TaskManager {
     private void addToHistory(Task task) {
         if (task == null)
             return;
-        viewedTasks.add(task);
+        // Сохраняем копию таски в текущем состоянии, т.к. есть требование к тестам:
+        // "убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных"
+        viewedTasks.add(task.clone());
         if (viewedTasks.size() > HISTORY_LIMIT) {
             viewedTasks.removeFirst();
         }
     }
 
     private void validateHistory() {
-        System.out.println("validateHistory");
         Predicate<Task> predicate = task1 -> {
             Class<? extends Task> aClass = task1.getClass();
             int id = task1.getId();

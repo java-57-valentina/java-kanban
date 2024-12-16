@@ -2,25 +2,19 @@ package tasks;
 
 import java.util.Objects;
 
-public class Task {
+public class Task implements Cloneable {
 
     protected int id;
     protected String name;
     protected String description;
     protected Status status;
 
-    Task(int id, String name, String description, Status status) {
+
+    public Task(int id, String name, String description, Status status) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
-    }
-
-    public Task(Task prototype) {
-        this.id = prototype.id;
-        this.name = prototype.name;
-        this.description = prototype.description;
-        this.status = prototype.status;
     }
 
     public Task(String name, String description, Status status) {
@@ -29,6 +23,7 @@ public class Task {
         this.description = description;
         this.status = status;
     }
+
 
     public Integer getId() {
         return id;
@@ -86,5 +81,19 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, status);
+    }
+
+    @Override
+    public Task clone() {
+        try {
+            Task clone = (Task) super.clone();
+            clone.setId(this.id);
+            clone.setName(this.name);
+            clone.setDescription(this.description);
+            clone.setStatus(this.status);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

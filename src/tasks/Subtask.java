@@ -14,10 +14,6 @@ public class Subtask extends Task {
         this(0, name, description, status, epicId);
     }
 
-    public Subtask(Subtask prototype) {
-        super(prototype);
-        this.epicId = prototype.epicId;
-    }
 
     public int getEpicId() {
         return epicId;
@@ -53,5 +49,12 @@ public class Subtask extends Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public Subtask clone() {
+        Subtask clone = (Subtask) super.clone();
+        clone.setEpicId(this.epicId);
+        return clone;
     }
 }

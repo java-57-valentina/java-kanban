@@ -15,12 +15,6 @@ public class Epic extends Task {
         this(0, name, description);
     }
 
-    public Epic(Epic prototype) {
-        super(prototype);
-        this.subtasks = new HashSet<>();
-        subtasks.addAll(prototype.subtasks);
-    }
-
     public HashSet<Integer> getSubtasks() {
         return subtasks;
     }
@@ -63,5 +57,14 @@ public class Epic extends Task {
                 ", status=" + status +
                 ", subtasks=" + subtasks +
                 '}';
+    }
+
+    @Override
+    public Epic clone() {
+        Epic clone = (Epic) super.clone();
+        for (Integer id : subtasks) {
+            clone.addSubtask(id);
+        }
+        return clone;
     }
 }

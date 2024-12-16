@@ -40,8 +40,8 @@ public class Main {
         System.out.println("\nИзменение статусов задач ...");
         /* Создаем клоны существующих объектов и модифицируем их
         иначе методы менеджера теряют смысл */
-        task1 = new Task(task1);
-        task2 = new Task(task2);
+        task1 = task1.clone();
+        task2 = task2.clone();
         task1.setStatus(Status.IN_PROGRESS);
         task2.setStatus(Status.DONE);
 
@@ -50,8 +50,8 @@ public class Main {
         printTasks(manager.getTasks(), "Задачи");
 
         System.out.println("\nИзменение статусов эпиков ...");
-        epic1 = new Epic(epic1);
-        epic2 = new Epic(epic2);
+        epic1 = epic1.clone();
+        epic2 = epic2.clone();
         epic1.setStatus(Status.IN_PROGRESS);
         epic2.setStatus(Status.DONE);
 
@@ -61,9 +61,9 @@ public class Main {
         printTasks(manager.getEpics(), "Эпики");
 
         System.out.println("\nИзменение статусов подзадач ...");
-        subtask1 = new Subtask(subtask1);
-        subtask2 = new Subtask(subtask2);
-        subtask3 = new Subtask(subtask3);
+        subtask1 = subtask1.clone();
+        subtask2 = subtask2.clone();
+        subtask3 = subtask3.clone();
         subtask1.setStatus(Status.IN_PROGRESS);
         subtask2.setStatus(Status.DONE);
         subtask3.setStatus(Status.DONE);
