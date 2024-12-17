@@ -10,4 +10,10 @@ class ManagersTest {
         Assertions.assertNotNull(manager);
     }
 
+    @Test
+    void getDefaultHistory() {
+        HistoryManager manager = Managers.getDefaultHistory();
+        Assertions.assertNotNull(manager);
+    }
+
 }

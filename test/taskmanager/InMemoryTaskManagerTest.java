@@ -42,8 +42,8 @@ class InMemoryTaskManagerTest {
         assertNotNull(found);
         assertEquals(added.getId(), found.getId());
 
-        // Тест "проверьте, что задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера"
-        // невозможно выполнить, так как менеджер в любом случае переопределяет Id таски
+        /* Тест "проверьте, что задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера"
+        невозможно выполнить, так как менеджер в любом случае переопределяет Id таски */
     }
 
     @Test
@@ -79,8 +79,8 @@ class InMemoryTaskManagerTest {
         assertNotNull(found);
         assertEquals(added.getId(), found.getId());
 
-        // Тест "проверьте, что объект Subtask нельзя сделать своим же эпиком"
-        // невозможно выполнить, так как данная ситуация невозможна на уровне компиляции из-за несоответствия типов
+        /* Тест "проверьте, что объект Subtask нельзя сделать своим же эпиком"
+        невозможно выполнить, так как данная ситуация невозможна на уровне компиляции из-за несоответствия типов */
     }
 
     @Test
@@ -127,8 +127,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void checkRemoveSubtask() {
-        final int epics = manager.getEpics().size();
-        final int subtasks = manager.getSubtasks().size();
         final int epicId = subtask.getEpicId();
         final int subtaskId = subtask.getId();
         manager.removeSubtask(subtask.getId());
@@ -140,7 +138,6 @@ class InMemoryTaskManagerTest {
     @Test
     void checkRemoveAllTasks() {
         manager.removeAllTasks();
-
         assertTrue(manager.getTasks().isEmpty());
     }
 
@@ -155,7 +152,6 @@ class InMemoryTaskManagerTest {
     @Test
     void checkRemoveAllSubtasks() {
         manager.removeAllEpics();
-
         assertTrue(manager.getSubtasks().isEmpty());
     }
 
@@ -176,19 +172,16 @@ class InMemoryTaskManagerTest {
     @Test
     void checkAddTaskToHistory() {
         int prevHistorySize = manager.getHistory().size();
-        final int taskId = task.getId();
+        int taskId = task.getId();
         Task viewed = manager.getTask(taskId).clone();
-        final List<Task> history = manager.getHistory();
-
-        assertEquals(prevHistorySize + 1, history.size());
-
+        List<Task> history = manager.getHistory();
         Task foundInHistory = history.getLast();
 
+        assertEquals(prevHistorySize + 1, history.size());
         assertEquals(foundInHistory, viewed);
 
         // Убедимся, что в истории останется прежняя версия таски, если мы ее модифицируем через менеджер
         manager.updateTask(new Task(taskId, "checkAddTaskToHistory", "New desc", Status.DONE));
-
         assertEquals(manager.getHistory().getLast(), viewed);
     }
 
@@ -268,7 +261,6 @@ class InMemoryTaskManagerTest {
     @Test
     void checkEpicStatusIfNoSubtasks() {
         manager.removeAllSubtasks();
-
         assertEquals(Status.NEW, epic.getStatus());
     }
 
