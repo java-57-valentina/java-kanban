@@ -27,10 +27,25 @@ class SubtaskTest {
     }
 
     @Test
-    void checkEquals() {
-        Subtask other = new Subtask(1, "Subtask Name", "Subtask Description", Status.NEW, 2);
+    void checkEqualsAllFields() {
+        Subtask subtask1 = new Subtask(1, "Subtask Name", "Description", Status.NEW, 2);
+        Subtask subtask2 = new Subtask(1, "Subtask Name", "Description", Status.NEW, 2);
 
-        assertEquals(subtask, other);
+        assertEquals(subtask1, subtask2);
+    }
+
+    @Test
+    void checkEqualsID() {
+        Subtask subtask1 = new Subtask(1, "Subtask Name 1", "Description 1", Status.NEW, 2);
+        Subtask subtask2 = new Subtask(1, "Subtask Name 2", "Description 2", Status.NEW, 2);
+
+        assertNotEquals(subtask1, subtask2);
+    }
+
+    @Test
+    void checkEqualsNull() {
+        Subtask subtask = new Subtask(1, "Subtask Name 1", "Description 1", Status.NEW, 2);
+        assertNotEquals(subtask, null);
     }
 
     @Test
@@ -46,4 +61,6 @@ class SubtaskTest {
 
         assertEquals(subtask, other);
     }
+
+
 }

@@ -11,19 +11,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    private final HistoryManager historyManager;
     private int uniqueId = 0;
     private final HashMap<Integer, Task> tasks;
     private final HashMap<Integer, Epic> epics;
     private final HashMap<Integer, Subtask> subtasks;
     private final ArrayList<Task> viewedTasks;
 
-    public InMemoryTaskManager() {
+    public InMemoryTaskManager(HistoryManager history) {
         uniqueId = 0;
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
         viewedTasks = new ArrayList<>();
+        historyManager = history;
     }
 
     @Override
@@ -66,21 +67,21 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
-        addToHistory(task);
+        historyManager.add(task);
         return task;
     }
 
     @Override
     public Epic getEpic(int id) {
         Epic epic = epics.get(id);
-        addToHistory(epic);
+        historyManager.add(epic);
         return epic;
     }
 
     @Override
     public Subtask getSubtask(int id) {
         Subtask subtask = subtasks.get(id);
-        addToHistory(subtask);
+        historyManager.add(subtask);
         return subtask;
     }
 
@@ -262,10 +263,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     private int nextId() {
         return ++uniqueId;
-    }
-    
-    private void addToHistory(Task task) {
-        historyManager.add(task);
     }
 
     @Override
