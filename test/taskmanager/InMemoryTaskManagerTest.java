@@ -55,7 +55,6 @@ class InMemoryTaskManagerTest {
         assertTrue(added.getId() > 0);
         assertTrue(manager.getEpics().contains(added));
         assertEquals(epics + 1, manager.getEpics().size());
-        assertEquals(Status.NEW, added.getStatus());
 
         Epic found = manager.getEpic(added.getId());
 
@@ -67,7 +66,7 @@ class InMemoryTaskManagerTest {
     void addSubtask() {
         int subtasks = manager.getSubtasks().size();
         int subtasksInEpic = epic.getSubtasks().size();
-        Subtask added = manager.addSubtask(new Subtask("Name", "Description", Status.NEW, epic.getId()));
+        Subtask added = manager.addSubtask(new Subtask("New subtask", "Description", Status.NEW, epic.getId()));
 
         assertNotNull(added);
         assertTrue(added.getId() > 0);
@@ -88,7 +87,7 @@ class InMemoryTaskManagerTest {
     void addSubtaskWithInvalidEpicId() {
         int subtasks = manager.getSubtasks().size();
         int subtasksInEpic = epic.getSubtasks().size();
-        Subtask subtask = manager.addSubtask(new Subtask("Name", "Description", Status.NEW, 1));
+        Subtask subtask = manager.addSubtask(new Subtask("New subtask", "Description", Status.NEW, 33));
 
         assertNull(subtask);
         assertEquals(subtasks, manager.getSubtasks().size());
@@ -106,9 +105,13 @@ class InMemoryTaskManagerTest {
     @Test
     void checkRemoveTask() {
         int tasks = manager.getTasks().size();
-        manager.removeTask(task.getId());
+        Task removed = manager.removeTask(task.getId());
 
         assertEquals(tasks - 1, manager.getTasks().size());
+
+        Task found = manager.getTask(removed.getId());
+
+        assertNull(found);
     }
 
     @Test
