@@ -16,14 +16,12 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks;
     private final HashMap<Integer, Epic> epics;
     private final HashMap<Integer, Subtask> subtasks;
-    private final ArrayList<Task> viewedTasks;
 
     public InMemoryTaskManager(HistoryManager history) {
         uniqueId = 0;
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
-        viewedTasks = new ArrayList<>();
         historyManager = history;
     }
 
@@ -235,7 +233,8 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         subtasks.replace(id, subtask);
-        updateEpicStatus(getEpic(subtask.getEpicId()));
+        Epic epic = epics.get(subtask.getEpicId());
+        updateEpicStatus(epic);
         return subtask; // return object in actual state
     }
 

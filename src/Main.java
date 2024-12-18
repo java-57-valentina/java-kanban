@@ -97,28 +97,25 @@ public class Main {
         System.out.println("\nОтображение истории просмотра ...");
         printTasks(manager.getHistory(), "История");
 
-        System.out.println("\nПросмотр всех задач ...");
-        for (Task task : manager.getTasks()) {
-            System.out.println(manager.getTask(task.getId()));
-        }
+        System.out.println("\nПросмотр и редактирование таски ...");
+        int taskId = manager.getTasks().getLast().getId();
+        Task taskForUpdate = manager.getTask(taskId).clone();
+        System.out.println(taskForUpdate);
+        taskForUpdate.setStatus(Status.IN_PROGRESS);
+        manager.updateTask(taskForUpdate);
+        Task updated = manager.getTask(taskId);
+        System.out.println(updated);
 
         System.out.println("\nОтображение истории просмотра ...");
-        printTasks(manager.getHistory(), "История");
-
-        System.out.println("\nУдаление рандомной таски ...");
-        Random random = new Random();
-        int idx = random.nextInt(manager.getTasks().size());
-        Task rndTask = manager.getTasks().get(idx);
-        System.out.println(rndTask);
-        manager.removeTask(rndTask.getId());
-
-        System.out.println("\nПовторное отображение истории просмотра ...");
         printTasks(manager.getHistory(), "История");
     }
 
     private static void printTasks(List<? extends Task> list, String title) {
         System.out.println();
         System.out.println(title + ":");
+        if (list.isEmpty())
+            System.out.println("[список пуст]");
+
         for (Task task : list)
             System.out.println(task);
     }
