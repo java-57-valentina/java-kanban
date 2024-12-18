@@ -3,8 +3,6 @@ package tasks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class EpicTest {
@@ -24,7 +22,7 @@ class EpicTest {
     }
 
     @Test
-    void checkNotEquals() {
+    void checkNotEqualsWithSameId() {
         int id = epic.getId();
         Epic otherEpic = new Epic(id, "name1", "description");
 
@@ -33,18 +31,18 @@ class EpicTest {
 
     @Test
     void addSubtask() {
-        int subtaskId = epic.getId() + 1;
+        final int subtaskId = 2;
         boolean result = epic.addSubtask(subtaskId);
-        HashSet<Integer> expected = new HashSet<>();
-        expected.add(subtaskId);
 
         assertTrue(result);
-        assertEquals(epic.getSubtasks(), expected);
+        assertTrue(epic.getSubtasks().contains(subtaskId));
+        assertEquals(1, epic.getSubtasks().size());
+
     }
 
     @Test
     void removeSubtask() {
-        int subtaskId = epic.getId() + 1;
+        final int subtaskId = epic.getId() + 1;
         epic.addSubtask(subtaskId);
         epic.removeSubtask(subtaskId);
 

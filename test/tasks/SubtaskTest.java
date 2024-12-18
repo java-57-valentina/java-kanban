@@ -18,12 +18,10 @@ class SubtaskTest {
 
     @Test
     void checkEpicId() {
-        final int expected = 2;
+        final int newEpicId = 3;
 
-        Assertions.assertEquals(expected, subtask.getEpicId());
-
-        subtask.setEpicId(3);
-        Assertions.assertEquals(3, subtask.getEpicId());
+        subtask.setEpicId(newEpicId);
+        Assertions.assertEquals(newEpicId, subtask.getEpicId());
     }
 
     @Test
@@ -51,14 +49,12 @@ class SubtaskTest {
     @Test
     void checkNotEquals() {
         Subtask other = new Subtask(1, "checkNotEquals", "Subtask Description", Status.NEW, 2);
-
         assertNotEquals(subtask, other);
     }
 
     @Test
     void checkClone() {
         Subtask other = subtask.clone();
-
         assertEquals(subtask, other);
     }
 

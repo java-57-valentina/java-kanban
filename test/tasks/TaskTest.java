@@ -3,9 +3,8 @@ package tasks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class TaskTest {
 
@@ -35,8 +34,6 @@ class TaskTest {
     @Test
     void checkClone() {
         Task otherTask = task.clone();
-
         assertEquals(task, otherTask);
     }
-
 }
