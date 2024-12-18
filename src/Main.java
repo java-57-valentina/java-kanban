@@ -6,7 +6,6 @@ import tasks.Subtask;
 import tasks.Task;
 
 import java.util.List;
-import java.util.Random;
 
 public class Main {
 
@@ -33,9 +32,9 @@ public class Main {
         subtask2 = manager.addSubtask(subtask2);
         subtask3 = manager.addSubtask(subtask3);
 
-        printTasks(manager.getTasks(), "Задачи");
-        printTasks(manager.getEpics(), "Эпики");
-        printTasks(manager.getSubtasks(), "Подзадачи");
+        printTasks(manager.getTasks(), "Задачи", manager);
+        printTasks(manager.getEpics(), "Эпики", manager);
+        printTasks(manager.getSubtasks(), "Подзадачи", manager);
 
         System.out.println("\nИзменение статусов задач ...");
         /* Создаем клоны существующих объектов и модифицируем их
@@ -47,7 +46,7 @@ public class Main {
 
         manager.updateTask(task1);
         manager.updateTask(task2);
-        printTasks(manager.getTasks(), "Задачи");
+        printTasks(manager.getTasks(), "Задачи", manager);
 
         System.out.println("\nИзменение статусов эпиков ...");
         epic1 = epic1.clone();
@@ -58,7 +57,7 @@ public class Main {
         // expected behavior: the statuses will not be changed
         manager.updateEpic(epic1);
         manager.updateEpic(epic2);
-        printTasks(manager.getEpics(), "Эпики");
+        printTasks(manager.getEpics(), "Эпики", manager);
 
         System.out.println("\nИзменение статусов подзадач ...");
         subtask1 = subtask1.clone();
@@ -71,31 +70,31 @@ public class Main {
         manager.updateSubtask(subtask1);
         manager.updateSubtask(subtask2);
         manager.updateSubtask(subtask3);
-        printTasks(manager.getEpics(), "Эпики");
-        printTasks(manager.getSubtasks(), "Подзадачи");
+        printTasks(manager.getEpics(), "Эпики", manager);
+        printTasks(manager.getSubtasks(), "Подзадачи", manager);
 
         System.out.println("\nУдаление задачи id:" + task1.getId() + " ...");
         manager.removeTask(task1.getId());
-        printTasks(manager.getTasks(), "Задачи");
+        printTasks(manager.getTasks(), "Задачи", manager);
 
         System.out.println("\nУдаление эпика id:" + epic1.getId() + " ...");
         manager.removeEpic(epic1.getId());
-        printTasks(manager.getEpics(), "Эпики");
-        printTasks(manager.getSubtasks(), "Подзадачи");
+        printTasks(manager.getEpics(), "Эпики", manager);
+        printTasks(manager.getSubtasks(), "Подзадачи", manager);
 
         System.out.println("\nДобавление подзадачи ...");
         Subtask subtask4 = new Subtask("Закоммитить изменения", "в гитхаб", Status.NEW, epic2.getId());
         subtask4 = manager.addSubtask(subtask4);
-        printTasks(manager.getEpics(), "Эпики");
-        printTasks(manager.getSubtasks(), "Подзадачи");
+        printTasks(manager.getEpics(), "Эпики", manager);
+        printTasks(manager.getSubtasks(), "Подзадачи", manager);
 
         System.out.println("\nУдаление всех эпиков ...");
         manager.removeAllEpics();
-        printTasks(manager.getEpics(), "Эпики");
-        printTasks(manager.getSubtasks(), "Подзадачи");
+        printTasks(manager.getEpics(), "Эпики", manager);
+        printTasks(manager.getSubtasks(), "Подзадачи", manager);
 
         System.out.println("\nОтображение истории просмотра ...");
-        printTasks(manager.getHistory(), "История");
+        printTasks(manager.getHistory(), "История", manager);
 
         System.out.println("\nПросмотр и редактирование таски ...");
         int taskId = manager.getTasks().getLast().getId();
@@ -107,16 +106,25 @@ public class Main {
         System.out.println(updated);
 
         System.out.println("\nОтображение истории просмотра ...");
-        printTasks(manager.getHistory(), "История");
+        printTasks(manager.getHistory(), "История", manager);
     }
 
-    private static void printTasks(List<? extends Task> list, String title) {
+    private static void printTasks(List<? extends Task> list, String title, TaskManager manager) {
         System.out.println();
         System.out.println(title + ":");
-        if (list.isEmpty())
-            System.out.println("[список пуст]");
 
-        for (Task task : list)
+        if (list.isEmpty()) {
+            System.out.println("[список пуст]");
+            return;
+        }
+
+        for (Task task : list) {
             System.out.println(task);
+            if (task instanceof Epic) {
+                for (Task subtask : manager.getSubtasksByEpicId(task.getId())) {
+                    System.out.println("   --> " + subtask);
+                }
+            }
+        }
     }
 }
