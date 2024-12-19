@@ -2,7 +2,7 @@ package taskmanager;
 
 import tasks.Task;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -10,7 +10,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> viewedTasks;
 
     public InMemoryHistoryManager() {
-        this.viewedTasks = new ArrayList<>();
+        this.viewedTasks = new LinkedList<>();
     }
 
     @Override
@@ -27,6 +27,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(viewedTasks);
+        return new LinkedList<>(viewedTasks);
     }
 }

@@ -21,7 +21,7 @@ class InMemoryTaskManagerTest {
     @BeforeEach
     void initManager() {
         HistoryManager defaultHistory = Managers.getDefaultHistory();
-        manager = new InMemoryTaskManager(defaultHistory);
+        manager = new InMemoryTaskManager();
         task = manager.addTask(new Task("Task Name", "Task description", Status.NEW));
         epic = manager.addEpic(new Epic("Epic Name", "Epic description"));
         subtask = manager.addSubtask(new Subtask("Subtask Name", "Subtask description", Status.NEW, epic.getId()));

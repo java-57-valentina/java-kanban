@@ -5,24 +5,24 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
     private int uniqueId = 0;
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer, Subtask> subtasks;
+    private final Map<Integer, Task> tasks;
+    private final Map<Integer, Epic> epics;
+    private final Map<Integer, Subtask> subtasks;
 
-    public InMemoryTaskManager(HistoryManager history) {
+    public InMemoryTaskManager() {
         uniqueId = 0;
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
-        historyManager = history;
+        historyManager = Managers.getDefaultHistory();
     }
 
     @Override
@@ -238,6 +238,10 @@ public class InMemoryTaskManager implements TaskManager {
         return subtask; // return object in actual state
     }
 
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
 
     private Status calculateEpicStatus(Epic epic) {
         if (epic.getSubtasks().isEmpty()) {
@@ -262,10 +266,5 @@ public class InMemoryTaskManager implements TaskManager {
 
     private int nextId() {
         return ++uniqueId;
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return historyManager.getHistory();
     }
 }
