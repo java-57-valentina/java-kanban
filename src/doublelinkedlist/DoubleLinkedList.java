@@ -3,7 +3,7 @@ package doublelinkedlist;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class DoubleLinkedList <K, T> implements Iterable<T> {
+public class DoubleLinkedList<K, T> implements Iterable<T> {
 
     private Node<T> head;
     private Node<T> tail;
@@ -22,8 +22,7 @@ public class DoubleLinkedList <K, T> implements Iterable<T> {
         Node<T> newNode = new Node<>(null, null, element);
         if (head == null) {
             head = newNode;
-        }
-        else {
+        } else {
             tail.setNext(newNode);
             newNode.setPrev(tail);
         }
