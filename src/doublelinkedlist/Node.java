@@ -19,7 +19,9 @@ public class Node<T> {
         this.previous = node;
     }
 
-    T getData() { return data; }
+    T getData() {
+        return data;
+    }
 
     Node<T> getNext() {
         return next;
