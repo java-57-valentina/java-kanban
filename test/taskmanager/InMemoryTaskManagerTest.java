@@ -8,6 +8,7 @@ import tasks.Subtask;
 import tasks.Task;
 
 import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +21,6 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     void initManager() {
-        HistoryManager defaultHistory = Managers.getDefaultHistory();
         manager = new InMemoryTaskManager();
         task = manager.addTask(new Task("Task Name", "Task description", Status.NEW));
         epic = manager.addEpic(new Epic("Epic Name", "Epic description"));
@@ -119,6 +119,26 @@ class InMemoryTaskManagerTest {
 
         assertEquals(tasks - 1, manager.getTasks().size());
         assertNull(found);
+    }
+
+    @Test
+    void checkRemoveViewedTask() {
+        final int tasksSize = manager.getTasks().size();
+
+        manager.getTask(task.getId()); // view existing task
+        List<Task> history = manager.getHistory();
+        boolean viewedFound = history.contains(task); // must be true
+
+        assertTrue(viewedFound);
+
+        Task removed = manager.removeTask(task.getId()); // remove
+        Task found = manager.getTask(removed.getId()); // must be null
+        history = manager.getHistory();
+        viewedFound = history.contains(task); // must be false
+
+        assertEquals(tasksSize - 1, manager.getTasks().size());
+        assertNull(found);
+        assertFalse(viewedFound);
     }
 
     @Test

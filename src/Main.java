@@ -107,6 +107,58 @@ public class Main {
 
         System.out.println("\nОтображение истории просмотра ...");
         printTasks(manager.getHistory(), "История", manager);
+
+        System.out.println("\nДополнительное задание");
+        System.out.println("\nУдаление всех задач, подзадач, эпиков ...");
+
+        manager.removeAllTasks();
+        manager.removeAllEpics();
+        manager.removeAllSubtasks();
+
+        printTasks(manager.getHistory(), "История", manager);
+
+        System.out.println("\nСоздание и просмотр задач/эпиков в разном порядке ...");
+
+        task1 = manager.addTask(
+                new Task("Купить швейную машинку", "Brother", Status.NEW));
+        task2 = manager.addTask(
+                new Task("Купить ткань", "в клетку", Status.NEW));
+
+        epic1 = manager.addEpic(
+                new Epic("Сшить пиджак", "по выкройке Бурда 2020/4"));
+        epic2 = manager.addEpic(
+                new Epic("Почистить швейную машинку", "согл. инструкции"));
+
+        subtask1 = manager.addSubtask(
+                new Subtask("Раскроить", "7 раз отмерить", Status.NEW, epic1.getId()));
+        subtask2 = manager.addSubtask(
+                new Subtask("Продублировать", "дублерином", Status.NEW, epic1.getId()));
+        subtask3 = manager.addSubtask(
+                new Subtask("Собрать", "Без слез", Status.NEW, epic1.getId()));
+
+        manager.getTask(task2.getId());
+        manager.getEpic(epic2.getId());
+        manager.getTask(task1.getId());
+        manager.getEpic(epic1.getId());
+        manager.getSubtask(subtask3.getId());
+
+        printTasks(manager.getHistory(), "История", manager);
+
+        System.out.println("\nОбновление задачи '" + task2.getName() + "' и повторный просмотр ...");
+
+        task2.setStatus(Status.DONE);
+        manager.updateTask(task2);
+        manager.getTask(task2.getId());
+
+        printTasks(manager.getHistory(), "История", manager);
+
+        System.out.println("\nУдаление задачи '" + task2.getName() + "' ...");
+        manager.removeTask(task2.getId());
+        printTasks(manager.getHistory(), "История", manager);
+
+        System.out.println("\nУдаление эпика '" + epic1.getName() + "' ...");
+        manager.removeEpic(epic1.getId());
+        printTasks(manager.getHistory(), "История", manager);
     }
 
     private static void printTasks(List<? extends Task> list, String title, TaskManager manager) {
@@ -119,10 +171,10 @@ public class Main {
         }
 
         for (Task task : list) {
-            System.out.println(task);
+            System.out.println("• " + task);
             if (task instanceof Epic) {
                 for (Task subtask : manager.getSubtasksByEpicId(task.getId())) {
-                    System.out.println("   --> " + subtask);
+                    System.out.println("   → " + subtask);
                 }
             }
         }
