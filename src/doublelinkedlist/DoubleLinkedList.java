@@ -1,9 +1,10 @@
 package doublelinkedlist;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class DoubleLinkedList<K, T> implements Iterable<T> {
+public class DoubleLinkedList<K, T> {
 
     private Node<T> head;
     private Node<T> tail;
@@ -33,40 +34,12 @@ public class DoubleLinkedList<K, T> implements Iterable<T> {
 
     public ArrayList<T> getElements() {
         ArrayList<T> list = new ArrayList<>(size);
-        for (T element : this)
-            list.add(element);
+        Node<T> node = head;
+        while (node != null) {
+            list.add(node.getData());
+            node = node.getNext();
+        }
         return list;
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        //noinspection UnnecessaryLocalVariable
-        Iterator<T> it = new Iterator<>() {
-            private Node<T> node = head;
-
-            @Override
-            public boolean hasNext() {
-                return node != null;
-            }
-
-            @Override
-            public T next() {
-                T data = node.getData();
-                node = node.getNext();
-                return data;
-            }
-        };
-        return it;
-    }
-
-    @Override
-    public void forEach(Consumer<? super T> action) {
-        Iterable.super.forEach(action);
-    }
-
-    @Override
-    public Spliterator<T> spliterator() {
-        return Iterable.super.spliterator();
     }
 
     public long size() {

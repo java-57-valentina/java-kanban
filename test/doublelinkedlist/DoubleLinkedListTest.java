@@ -81,18 +81,6 @@ class DoubleLinkedListTest {
     }
 
     @Test
-    void iterator() {
-    }
-
-    @Test
-    void forEach() {
-    }
-
-    @Test
-    void spliterator() {
-    }
-
-    @Test
     void containsKey() {
         assertFalse(list.containsKey(1));
 
