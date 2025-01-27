@@ -1,32 +1,31 @@
 package taskmanager;
 
+import doublelinkedlist.DoubleLinkedList;
 import tasks.Task;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final int HISTORY_LIMIT = 10;
-    private List<Task> viewedTasks;
+    private final DoubleLinkedList<Integer, Task> historyList;
 
     public InMemoryHistoryManager() {
-        this.viewedTasks = new LinkedList<>();
+        historyList = new DoubleLinkedList<>();
     }
 
     @Override
     public void add(Task task) {
         if (task == null)
             return;
-        // Сохраняем копию таски в текущем состоянии, т.к. есть требование к тестам:
-        // "убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных"
-        viewedTasks.add(task.clone());
-        if (viewedTasks.size() > HISTORY_LIMIT) {
-            viewedTasks.removeFirst();
-        }
+        historyList.add(task.getId(), task.clone());
+    }
+
+    @Override
+    public void remove(int id) {
+        historyList.remove(id);
     }
 
     @Override
     public List<Task> getHistory() {
-        return new LinkedList<>(viewedTasks);
+        return historyList.getElements();
     }
 }

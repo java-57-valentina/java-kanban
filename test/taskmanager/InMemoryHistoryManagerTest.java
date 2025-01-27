@@ -7,8 +7,7 @@ import tasks.Task;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
@@ -30,19 +29,15 @@ class InMemoryHistoryManagerTest {
         assertEquals(task, history.getLast());
     }
 
-    void addTasks(int count) {
+    @Test
+    void checkHistoryCapacityWhenTasksAdded_5() {
+        final int count = 5;
+        final int expected = 5;
+
         for (int i = 0; i < count; i++) {
             Task task = new Task(i, "Task Name " + i, "Task description " + i, Status.NEW);
             manager.add(task);
         }
-    }
-
-    @Test
-    void checkHistoryCapacityWhenTasksAdded_5() {
-        final int tasks = 5;
-        final int expected = 5;
-
-        addTasks(tasks);
         List<Task> history = manager.getHistory();
 
         assertNotNull(history);
@@ -50,26 +45,19 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void checkHistoryCapacityWhenTasksAdded_10() {
-        final int tasks = 10;
-        final int expected = 10;
+    void checkUniquenessOfTasksInHistory() {
+        manager.add(new Task(1, "Task1", "Task1 description", Status.NEW));
+        manager.add(new Task(2, "Task2", "Task2 description", Status.NEW));
+        manager.add(new Task(3, "Task3", "Task3 description", Status.NEW));
+        manager.add(new Task(2, "Task2", "Task2 description", Status.IN_PROGRESS));
 
-        addTasks(tasks);
+        int expectedSize = 3;
         List<Task> history = manager.getHistory();
+        assertEquals(expectedSize, history.size());
 
-        assertNotNull(history);
-        assertEquals(expected, history.size());
-    }
-
-    @Test
-    void checkHistoryCapacityWhenTasksAdded_11() {
-        final int tasks = 11;
-        final int expected = 10;
-
-        addTasks(tasks);
-        List<Task> history = manager.getHistory();
-
-        assertNotNull(history);
-        assertEquals(expected, history.size());
+        assertTrue(history.contains(new Task(1, "Task1", "Task1 description", Status.NEW)));
+        assertTrue(history.contains(new Task(2, "Task2", "Task2 description", Status.IN_PROGRESS)));
+        assertTrue(history.contains(new Task(3, "Task3", "Task3 description", Status.NEW)));
+        assertFalse(history.contains(new Task(2, "Task2", "Task2 description", Status.NEW)));
     }
 }
