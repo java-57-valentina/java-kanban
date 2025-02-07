@@ -2,7 +2,6 @@ package tasks;
 
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class Epic extends Task {
     private HashSet<Integer> subtasks;
@@ -57,7 +56,7 @@ public class Epic extends Task {
     @Override
     public Epic clone() {
         Epic clone = (Epic) super.clone();
-        clone.subtasks = new HashSet<> (this.subtasks);
+        clone.subtasks = new HashSet<>(this.subtasks);
         return clone;
     }
 }
