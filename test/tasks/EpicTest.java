@@ -48,4 +48,14 @@ class EpicTest {
 
         assertTrue(epic.getSubtasks().isEmpty());
     }
+
+    @Test
+    void testClone() {
+        Epic clone = epic.clone();
+
+        assertNotSame(epic, clone);
+        assertEquals(epic, clone);
+        assertNotSame(epic.getSubtasks(), clone.getSubtasks());
+        assertEquals(epic.getSubtasks(), clone.getSubtasks());
+    }
 }

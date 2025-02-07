@@ -2,9 +2,10 @@ package tasks;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class Epic extends Task {
-    private final HashSet<Integer> subtasks;
+    private HashSet<Integer> subtasks;
 
     public Epic(int id, String name, String description) {
         super(id, name, description, Status.NEW);
@@ -50,21 +51,13 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", subtasks=" + subtasks +
-                '}';
+        return String.format("EPIC, %d, %s, %s, %s\n", id, name, description, status.toString());
     }
 
     @Override
     public Epic clone() {
         Epic clone = (Epic) super.clone();
-        for (Integer id : subtasks) {
-            clone.addSubtask(id);
-        }
+        clone.subtasks = new HashSet<> (this.subtasks);
         return clone;
     }
 }
