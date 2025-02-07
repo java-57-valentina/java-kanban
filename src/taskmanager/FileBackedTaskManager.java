@@ -223,8 +223,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskType taskType;
         try {
             taskType = TaskType.valueOf(parts[0]);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new LoadTaskException("Неподдерживаемый тип задачи " + parts[0]);
         }
 
@@ -283,7 +282,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             Status status = Status.valueOf(parts[4]);
             return new Task(id, name, desk, status);
         } catch (IllegalArgumentException e) {
-                throw new LoadTaskException("Неподдерживаемый формат строки: " + String.join(",", parts));
+            throw new LoadTaskException("Неподдерживаемый формат строки: " + String.join(",", parts));
         }
     }
 }
