@@ -12,160 +12,92 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final Path path;
 
-    public FileBackedTaskManager(Path path) {
+    private FileBackedTaskManager(Path path) {
         super();
         this.path = path;
-        try {
-            loadFromFile(path);
-        } catch (LoadTaskException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            // It's okay
-        }
     }
 
     @Override
     public Task addTask(Task task) {
         Task added = super.addTask(task);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return added;
     }
 
     @Override
     public Epic addEpic(Epic epic) {
         Epic added = super.addEpic(epic);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return added;
     }
 
     @Override
     public Subtask addSubtask(Subtask subtask) {
         Subtask added = super.addSubtask(subtask);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return added;
     }
 
     @Override
     public int removeAllTasks() {
         int result = super.removeAllTasks();
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return result;
     }
 
     @Override
     public int removeAllEpics() {
         int result = super.removeAllEpics();
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return result;
     }
 
     @Override
     public int removeAllSubtasks() {
         int result = super.removeAllSubtasks();
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return result;
     }
 
     @Override
     public Task removeTask(int id) {
         Task removed = super.removeTask(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return removed;
     }
 
     @Override
     public Epic removeEpic(int id) {
         Epic removed = super.removeEpic(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return removed;
     }
 
     @Override
     public Subtask removeSubtask(int id) {
         Subtask removed = super.removeSubtask(id);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return removed;
     }
 
     @Override
     public Task updateTask(Task task) {
         Task updated = super.updateTask(task);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return updated;
     }
 
     @Override
     public Epic updateEpic(Epic epic) {
         Epic updated = super.updateEpic(epic);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return updated;
     }
 
     @Override
     public Subtask updateSubtask(Subtask subtask) {
         Subtask updated = super.updateSubtask(subtask);
-        try {
-            save();
-        } catch (ManagerSaveException e) {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-        }
+        save();
         return updated;
     }
 
@@ -190,32 +122,33 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    protected void loadFromFile(Path path) throws LoadTaskException, FileNotFoundException {
+    public static FileBackedTaskManager loadFromFile(Path path) throws LoadTaskException {
 
+        FileBackedTaskManager manager = new FileBackedTaskManager(path);
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile(), StandardCharsets.UTF_8))) {
 
             reader.readLine(); // skip first line (header)
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Task item = fromString(line);
-                uniqueId = Math.max(uniqueId, item.getId()); // Счетчик id не должен быть меньше id какого-либо таска
+                manager.uniqueId = Math.max(manager.uniqueId, item.getId()); // Счетчик id не должен быть меньше id какого-либо таска
 
                 if (item instanceof Epic) {
-                    addEpicImpl((Epic) item);
+                    manager.addEpicImpl((Epic) item);
                 } else if (item instanceof Subtask) {
-                    addSubtaskImpl((Subtask) item);
+                    manager.addSubtaskImpl((Subtask) item);
                 } else {
-                    addTaskImpl(item);
+                    manager.addTaskImpl(item);
                 }
             }
-        } catch (FileNotFoundException e) {
-            throw e;
+            return manager;
         } catch (IOException e) {
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
             throw new RuntimeException("Произошла ошибка чтения задач из файла '" + path.getFileName() + "'");
         }
     }
 
-    private Task fromString(String line) throws LoadTaskException {
+    private static Task fromString(String line) throws LoadTaskException {
         String[] parts = line.split(", ");
         if (parts.length == 0 || line.isBlank())
             throw new LoadTaskException("Неверный формат строки для десериализации задачи");
@@ -241,7 +174,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private Subtask subtaskFromString(String[] parts) throws LoadTaskException {
+    private static Subtask subtaskFromString(String[] parts) throws LoadTaskException {
         if (parts.length < 6)
             throw new LoadTaskException("Неверный формат строки");
 
@@ -257,7 +190,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private Epic epicFromString(String[] parts) throws LoadTaskException {
+    private static Epic epicFromString(String[] parts) throws LoadTaskException {
         if (parts.length < 4)
             throw new LoadTaskException("Неверный формат строки");
 
@@ -271,7 +204,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private Task taskFromString(String[] parts) throws LoadTaskException {
+    private static Task taskFromString(String[] parts) throws LoadTaskException {
         if (parts.length < 5)
             throw new LoadTaskException("Неверный формат строки");
 

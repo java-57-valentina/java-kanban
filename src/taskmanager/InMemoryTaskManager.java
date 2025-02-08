@@ -74,8 +74,6 @@ public class InMemoryTaskManager implements TaskManager {
         return subtask;
     }
 
-
-
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
