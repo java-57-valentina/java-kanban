@@ -24,7 +24,6 @@ public class Task implements Cloneable {
         this.status = status;
     }
 
-
     public Integer getId() {
         return id;
     }
@@ -59,12 +58,7 @@ public class Task implements Cloneable {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return String.format("TASK, %d, %s, %s, %s\n", id, name, description, status.toString());
     }
 
     @Override
