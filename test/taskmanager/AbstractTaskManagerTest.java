@@ -26,10 +26,10 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
     protected abstract T getTaskManagerForChecks();
 
     protected void createTasks() {
-        task = manager.addTask(new Task("Задача1", "Описание задачи", Status.NEW));
+        task = manager.addTask(new Task("Задача1", "Описание задачи", Status.NEW, null, null));
         epic = manager.addEpic(new Epic("Эпик1", "Описание эпика"));
         subtask = manager.addSubtask(
-                new Subtask("Подзадача1", "Описание подзадачи", Status.IN_PROGRESS, epic.getId()));
+                new Subtask("Подзадача1", "Описание подзадачи", Status.IN_PROGRESS, epic.getId(), null, null));
     }
 
     @Test
@@ -39,7 +39,7 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         final Status status = Status.DONE;
 
         int count = manager.getTasks().size();
-        Task added = manager.addTask(new Task(name, description, status));
+        Task added = manager.addTask(new Task(name, description, status, null, null));
 
         TaskManager taskManager = getTaskManagerForChecks();
         Task found = taskManager.getTask(added.getId());
@@ -78,7 +78,7 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
     void addSubtask() {
         int count = manager.getEpics().size();
         Task added = manager.addSubtask(
-                new Subtask("New Subtask", "Desc", Status.IN_PROGRESS, epic.getId()));
+                new Subtask("New Subtask", "Desc", Status.IN_PROGRESS, epic.getId(), null, null));
 
         TaskManager taskManager = getTaskManagerForChecks();
         Epic found = taskManager.getEpic(epic.getId());
@@ -96,7 +96,7 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         final int subtasks = manager.getSubtasks().size();
         final int subtasksInEpic = epic.getSubtasks().size();
 
-        Subtask subtask = manager.addSubtask(new Subtask("New subtask", "Description", Status.NEW, 33));
+        Subtask subtask = manager.addSubtask(new Subtask("New subtask", "Description", Status.NEW, 33, null, null));
 
         TaskManager taskManager = getTaskManagerForChecks();
         Epic foundEpic = taskManager.getEpic(epic.getId());
@@ -104,6 +104,22 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         assertNull(subtask);
         assertEquals(subtasks, taskManager.getSubtasks().size());
         assertEquals(subtasksInEpic, foundEpic.getSubtasks().size());
+    }
+
+    @Test
+    void checkPrioritizedTasks() {
+        manager.removeAllTasks();
+        assertTrue(manager.getPrioritizedTasks().isEmpty());
+
+        int id1 = manager.addTask(new Task("1", "", Status.NEW, LocalDateTime.of(2025,2,2,12,0), Duration.ofMinutes(15))).getId();
+        int id2 = manager.addTask(new Task("2", "", Status.NEW, LocalDateTime.of(2025,1,2,12,0), Duration.ofMinutes(15))).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        assertEquals(2, prioritizedTasks.size());
+        assertEquals(id2, prioritizedTasks.get(0).getId());
+        assertEquals(id1, prioritizedTasks.get(1).getId());
     }
 
     @Test
@@ -283,7 +299,7 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         final int id = task.getId();
 
         Task oldVersion = manager.getTask(id).clone();
-        manager.updateTask(new Task(id, "checkAddTaskToHistory", "", Status.DONE));
+        manager.updateTask(new Task(id, "checkAddTaskToHistory", "", Status.DONE, null, null));
         Task taskInHistory = manager.getHistory().getLast();
 
         assertEquals(oldVersion.getName(), taskInHistory.getName());

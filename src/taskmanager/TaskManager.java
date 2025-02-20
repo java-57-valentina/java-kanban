@@ -23,6 +23,8 @@ public interface TaskManager {
 
     List<Task> getTasks();
 
+    List<Task> getPrioritizedTasks();
+
     List<Epic> getEpics();
 
     List<Subtask> getSubtasks();
@@ -30,8 +32,10 @@ public interface TaskManager {
     List<Subtask> getSubtasksByEpicId(int epicId);
 
 
+    @SuppressWarnings("unused")
     Status getTaskStatus(int id);
 
+    @SuppressWarnings("unused")
     Status getEpicStatus(int id);
 
     Status getSubtaskStatus(int id);

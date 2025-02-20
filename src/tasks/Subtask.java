@@ -11,15 +11,20 @@ import java.util.Objects;
 public class Subtask extends Task {
     private int epicId;
 
-    public Subtask(int id, String name, String description, Status status, int epicId) {
-        super(id, name, description, status);
+    public Subtask(int id, String name, String description, Status status, int epicId, LocalDateTime time,
+                   Duration duration) {
+        super(id, name, description, status, time, duration);
         this.epicId = epicId;
     }
 
-    public Subtask(String name, String description, Status status, int epicId) {
-        this(0, name, description, status, epicId);
+    public Subtask(String name, String description, Status status, int epicId, LocalDateTime time,
+                   Duration duration) {
+        this(0, name, description, status, epicId, time, duration);
     }
 
+    public Subtask(String name, String description, Status status, int epicId) {
+        this(name, description, status, epicId, null, null);
+    }
 
     public int getEpicId() {
         return epicId;
@@ -70,7 +75,7 @@ public class Subtask extends Task {
             String name = parts.get(1);
             String desk = parts.get(2);
             Status status = Status.valueOf(parts.get(3));
-            Subtask subtask = new Subtask(id, name, desk, status, epicId);
+            Subtask subtask = new Subtask(id, name, desk, status, epicId, null, null);
             try {
                 LocalDateTime startTime = LocalDateTime.parse(parts.get(5), formatter);
                 subtask.setStartTime(startTime);

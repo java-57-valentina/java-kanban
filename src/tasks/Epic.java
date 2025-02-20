@@ -12,10 +12,10 @@ public class Epic extends Task {
     private HashSet<Integer> subtasks;
     private LocalDateTime endTime;
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.YYYY HH:mm");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public Epic(int id, String name, String description) {
-        super(id, name, description, Status.NEW);
+        super(id, name, description, Status.NEW, null, null);
         subtasks = new HashSet<>();
     }
 

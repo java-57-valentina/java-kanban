@@ -1,6 +1,7 @@
 package tasks;
 
 import exception.LoadTaskException;
+import taskmanager.TaskManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,18 +22,21 @@ public class Task implements Cloneable {
     static DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 
-    public Task(int id, String name, String description, Status status) {
+    public Task(int id, String name, String description, Status status, LocalDateTime time, Duration duration) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
+        this.startTime = time;
+        this.duration = duration;
+    }
+
+    public Task(String name, String description, Status status, LocalDateTime time, Duration duration) {
+        this(0, name, description, status, time, duration);
     }
 
     public Task(String name, String description, Status status) {
-        this.id = 0;
-        this.name = name;
-        this.description = description;
-        this.status = status;
+        this(name, description, status, null, null);
     }
 
     public Integer getId() {
@@ -111,7 +115,7 @@ public class Task implements Cloneable {
             String name = parts.get(1);
             String desk = parts.get(2);
             Status status = Status.valueOf(parts.get(3));
-                Task task = new Task(id, name, desk, status);
+            Task task = new Task(id, name, desk, status, null, null);
             try {
                 LocalDateTime startTime = LocalDateTime.parse(parts.get(4), formatter);
                 task.setStartTime(startTime);
