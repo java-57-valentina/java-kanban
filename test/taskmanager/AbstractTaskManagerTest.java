@@ -7,6 +7,8 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
@@ -29,7 +31,6 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         subtask = manager.addSubtask(
                 new Subtask("Подзадача1", "Описание подзадачи", Status.IN_PROGRESS, epic.getId()));
     }
-
 
     @Test
     void addTask() {
@@ -361,4 +362,277 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
 
         assertEquals(expected, found.getStatus());
     }
+
+    @Test
+    void checkTaskStartTime() {
+        LocalDateTime localTime = LocalDateTime.of(2025, 1, 10, 13, 13);
+
+        Task task = new Task("Test", "Desc", Status.NEW);
+        task.setStartTime(localTime);
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+
+        assertNotNull(found);
+        assertEquals(found.getStartTime(), localTime);
+    }
+
+    @Test
+    void checkTaskStartTimeNull() {
+        Task task = new Task("Test", "Desc", Status.NEW);
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+
+        assertNotNull(found);
+        assertNull(found.getStartTime());
+    }
+
+    @Test
+    void checkTaskDuration() {
+        long minutes = 20;
+
+        Task task = new Task("Test", "Desc", Status.NEW);
+        task.setDuration(Duration.ofMinutes(minutes));
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+        Duration duration = found.getDuration();
+
+        assertNotNull(found);
+        assertNotNull(duration);
+        assertEquals(duration.toMinutes(), minutes);
+    }
+
+    @Test
+    void checkTaskDurationNull() {
+        Task task = new Task("Test", "Desc", Status.NEW);
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+        Duration duration = found.getDuration();
+
+        assertNotNull(found);
+        assertNull(duration);
+    }
+
+    @Test
+    void checkTaskEndTime() {
+        LocalDateTime localTime = LocalDateTime.of(2025, 1, 10, 13, 13);
+        Duration duration = Duration.ofMinutes(30);
+        LocalDateTime expectedEndTime = localTime.plus(duration);
+
+        Task task = new Task("Test", "Desc", Status.NEW);
+        task.setStartTime(localTime);
+        task.setDuration(duration);
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNotNull(endTime);
+        assertEquals(endTime, expectedEndTime);
+    }
+
+    @Test
+    void checkSubtaskEndTime() {
+        LocalDateTime localTime = LocalDateTime.of(2025, 1, 10, 13, 13);
+        Duration duration = Duration.ofMinutes(30);
+        LocalDateTime expectedEndTime = localTime.plus(duration);
+
+        Subtask task = new Subtask("Test", "Desc", Status.NEW, epic.getId());
+        task.setStartTime(localTime);
+        task.setDuration(duration);
+        int id = manager.addSubtask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getSubtask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNotNull(endTime);
+        assertEquals(endTime, expectedEndTime);
+    }
+
+    @Test
+    void checkEpicEndTimeFewSubtasks_1() {
+        manager.removeAllSubtasks();
+
+        LocalDateTime time_min = LocalDateTime.of(2025, 2, 18, 12, 30);
+        LocalDateTime time_med = LocalDateTime.of(2025, 2, 19, 8, 10);
+        LocalDateTime time_max = LocalDateTime.of(2025, 2, 21, 10, 20);
+
+        Subtask subtask1 = new Subtask("Su1", "Des1", Status.NEW, epic.getId());
+        Subtask subtask2 = new Subtask("Su2", "Des2", Status.NEW, epic.getId());
+        Subtask subtask3 = new Subtask("Su3", "Des3", Status.NEW, epic.getId());
+        Subtask subtask4 = new Subtask("Su4", "Des4", Status.NEW, epic.getId());
+
+        subtask1.setStartTime(time_max);
+        subtask2.setStartTime(time_min);
+        subtask3.setStartTime(time_med);
+        subtask4.setStartTime(null);
+
+        subtask1.setDuration(Duration.ofMinutes(30));
+        subtask2.setDuration(Duration.ofMinutes(60));
+        subtask3.setDuration(Duration.ofMinutes(10));
+        subtask4.setDuration(null);
+
+        final int expDuration = 30 + 60 + 10;
+        final LocalDateTime expEndTime = time_max.plus(Duration.ofMinutes(30));
+
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Epic found = taskManager.getEpic(epic.getId());
+        LocalDateTime startTime = found.getStartTime();
+        LocalDateTime endTime = found.getEndTime();
+        Duration duration = found.getDuration();
+
+        assertNotNull(startTime);
+        assertNotNull(duration);
+        assertEquals(time_min, startTime);
+        assertEquals(expEndTime, endTime);
+        assertEquals(expDuration, duration.toMinutes());
+    }
+
+    @Test
+    void checkEpicEndTimeFewSubtasksNullTime() {
+        manager.removeAllSubtasks();
+
+        Subtask subtask1 = new Subtask("Su1", "Des1", Status.NEW, epic.getId());
+        Subtask subtask2 = new Subtask("Su2", "Des2", Status.NEW, epic.getId());
+
+        subtask1.setDuration(Duration.ofMinutes(30));
+        subtask2.setDuration(Duration.ofMinutes(60));
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+
+        final int expDuration = 30 + 60;
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Epic found = taskManager.getEpic(epic.getId());
+        LocalDateTime startTime = found.getStartTime();
+        LocalDateTime endTime = found.getEndTime();
+        Duration duration = found.getDuration();
+
+        assertNull(startTime);
+        assertNull(endTime);
+        assertEquals(expDuration, duration.toMinutes());
+    }
+
+    @Test
+    void checkEpicEndTimeNoSubtasks() {
+        manager.removeAllSubtasks();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Epic found = taskManager.getEpic(epic.getId());
+
+        assertTrue(taskManager.getSubtasksByEpicId(epic.getId()).isEmpty());
+        assertNotNull(found);
+        assertNull(found.getStartTime());
+        assertNull(found.getEndTime());
+        assertNull(found.getDuration());
+    }
+
+    void setTimeForTask(Task task) {
+        LocalDateTime localTime = LocalDateTime.of(2025, 1, 10, 13, 13);
+        task.setStartTime(localTime);
+    }
+
+    void setDurationForTask(Task task) {
+        Duration duration = Duration.ofMinutes(30);
+        task.setDuration(duration);
+    }
+
+    @Test
+    void checkTaskEndTimeNull_1() {
+        Task task = new Task("Test", "Desc", Status.NEW);
+        setTimeForTask(task);
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNull(endTime);
+    }
+
+    @Test
+    void checkTaskEndTimeNull_2() {
+        Task task = new Task("Test", "Desc", Status.NEW);
+        setDurationForTask(task);
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNull(endTime);
+    }
+
+    @Test
+    void checkTaskEndTimeNull_3() {
+        Task task = new Task("Test", "Desc", Status.NEW);
+        int id = manager.addTask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getTask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNull(endTime);
+    }
+
+    @Test
+    void checkSubtaskEndTimeNull_1() {
+        Subtask task = new Subtask("Test", "Desc", Status.NEW, epic.getId());
+        setTimeForTask(task);
+        int id = manager.addSubtask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getSubtask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNull(endTime);
+    }
+
+    @Test
+    void checkSubtaskEndTimeNull_2() {
+        Subtask task = new Subtask("Test", "Desc", Status.NEW, epic.getId());
+        setDurationForTask(task);
+        int id = manager.addSubtask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getSubtask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNull(endTime);
+    }
+
+    @Test
+    void checkSubtaskEndTimeNull_3() {
+        Subtask task = new Subtask("Test", "Desc", Status.NEW, epic.getId());
+        int id = manager.addSubtask(task).getId();
+
+        TaskManager taskManager = getTaskManagerForChecks();
+        Task found = taskManager.getSubtask(id);
+        LocalDateTime endTime = found.getEndTime();
+
+        assertNotNull(found);
+        assertNull(endTime);
+    }
+
+
 }

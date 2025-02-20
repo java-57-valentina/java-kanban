@@ -1,10 +1,18 @@
 package tasks;
 
+import exception.LoadTaskException;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
     private HashSet<Integer> subtasks;
+    private LocalDateTime endTime;
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.YYYY HH:mm");
 
     public Epic(int id, String name, String description) {
         super(id, name, description, Status.NEW);
@@ -32,6 +40,15 @@ public class Epic extends Task {
     }
 
     @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -40,17 +57,48 @@ public class Epic extends Task {
         if (!super.equals(o))
             return false;
         Epic epic = (Epic) o;
-        return Objects.equals(subtasks, epic.subtasks);
+        return Objects.equals(subtasks, epic.subtasks)
+                && Objects.equals(endTime, epic.endTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subtasks);
+        return Objects.hash(super.hashCode(), subtasks, endTime);
     }
 
     @Override
     public String toString() {
-        return String.format("EPIC, %d, %s, %s, %s\n", id, name, description, status.toString());
+
+        return String.format("EPIC: %d, %s, %s, %s, %s, %s, %s min\n",
+                id,
+                name,
+                description,
+                status.toString(),
+                startTime == null ? "null" : startTime.format(formatter),
+                endTime == null ? "null" : endTime.format(formatter),
+                duration == null ? "null" : duration.toMinutes());
+    }
+
+    @Override
+    public String toLine() {
+        return String.format("EPIC, %d, %s, %s\n",
+                id,
+                name,
+                description);
+    }
+
+    public static Epic fromLine(List<String> parts) throws LoadTaskException {
+        if (parts.size() < 3)
+            throw new LoadTaskException("Неверный формат строки");
+
+        try {
+            int id = Integer.parseInt(parts.get(0));
+            String name = parts.get(1);
+            String desk = parts.get(2);
+            return new Epic(id, name, desk);
+        } catch (IllegalArgumentException e) {
+            throw new LoadTaskException("Неподдерживаемый формат строки: " + String.join(",", parts));
+        }
     }
 
     @Override
