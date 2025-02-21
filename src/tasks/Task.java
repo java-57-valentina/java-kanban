@@ -1,7 +1,6 @@
 package tasks;
 
 import exception.LoadTaskException;
-import taskmanager.TaskManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -120,7 +119,9 @@ public class Task implements Cloneable {
                 LocalDateTime startTime = LocalDateTime.parse(parts.get(4), formatter);
                 task.setStartTime(startTime);
             }
-            catch (DateTimeParseException ignored) { }
+            catch (DateTimeParseException ignored) {
+                
+            }
             try {
                 Duration duration = Duration.ofMinutes(Integer.parseInt(parts.get(5)));
                 task.setDuration(duration);
