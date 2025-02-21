@@ -1,5 +1,6 @@
 package taskmanager;
 
+import exception.TaskTimeConflictException;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -28,9 +29,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task addTask(Task task) {
+    public Task addTask(Task task) throws TaskTimeConflictException {
         if (task == null)
             return null;
+        Optional<Task> conflict = checkTaskTimeCollision(task);
+        if (conflict.isPresent())
+            throw new TaskTimeConflictException(task.getName(), conflict.get().getId());
+
         task.setId(nextId());
         return addTaskImpl(task);
     }
@@ -57,13 +62,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) throws TaskTimeConflictException {
         if (subtask == null)
             return null;
 
         final Epic epic = epics.get(subtask.getEpicId());
         if (epic == null)
             return null;
+
+        Optional<Task> conflict = checkTaskTimeCollision(subtask);
+        if (conflict.isPresent())
+            throw new TaskTimeConflictException(subtask.getName(), conflict.get().getId());
 
         subtask.setId(nextId());
         return addSubtaskImpl(subtask);
@@ -149,9 +158,7 @@ public class InMemoryTaskManager implements TaskManager {
     public int removeAllTasks() {
         int count = tasks.size();
         prioritizedTasks.removeIf(task -> task.getClass().equals(Task.class));
-        for (Integer id : tasks.keySet()) {
-            historyManager.remove(id);
-        }
+        tasks.keySet().forEach(historyManager::remove);
         tasks.clear();
 
         return count;
@@ -162,12 +169,8 @@ public class InMemoryTaskManager implements TaskManager {
         int count = epics.size();
 
         prioritizedTasks.removeIf(task -> task.getClass().equals(Subtask.class));
-        for (Integer id : epics.keySet()) {
-            historyManager.remove(id);
-        }
-        for (Integer id : subtasks.keySet()) {
-            historyManager.remove(id);
-        }
+        epics.keySet().forEach(historyManager::remove);
+        subtasks.keySet().forEach(historyManager::remove);
 
         epics.clear();
         subtasks.clear();
@@ -178,9 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
     public int removeAllSubtasks() {
         int count = subtasks.size();
         prioritizedTasks.removeIf(task -> task.getClass().equals(Subtask.class));
-        for (Integer id : subtasks.keySet()) {
-            historyManager.remove(id);
-        }
+        subtasks.keySet().forEach(historyManager::remove);
         subtasks.clear();
         for (Epic e : epics.values()) {
             e.removeAllSubtasks();
@@ -209,9 +210,7 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
 
         historyManager.remove(removed.getId());
-        for (Integer sid : removed.getSubtasks())
-            historyManager.remove(sid);
-
+        removed.getSubtasks().forEach(historyManager::remove);
         prioritizedTasks.removeIf(task -> removed.getSubtasks().contains(task.getId()));
         subtasks.values().removeIf(c -> c.getEpicId() == id);
         return removed;
@@ -236,7 +235,11 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task) throws TaskTimeConflictException {
+        Optional<Task> conflict = checkTaskTimeCollision(task);
+        if (conflict.isPresent())
+            throw new TaskTimeConflictException(task.getName(), conflict.get().getId());
+
         Task old = tasks.replace(task.getId(), task);
         if (old == null) {
             return null;
@@ -262,8 +265,7 @@ public class InMemoryTaskManager implements TaskManager {
         /* We don't update epic's list of subtasks
         all changes in subtasks must be using addSubtask/removeSubtask */
         epic.removeAllSubtasks();
-        for (int id : old.getSubtasks())
-            epic.addSubtask(id);
+        old.getSubtasks().forEach(epic::addSubtask);
 
         epics.replace(epic.getId(), epic);
         updateEpicStatus(epic);
@@ -272,10 +274,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask updateSubtask(Subtask subtask) {
+    public Subtask updateSubtask(Subtask subtask) throws TaskTimeConflictException {
 
-        if (subtask == null)
-            return null;
+        Optional<Task> conflict = checkTaskTimeCollision(subtask);
+        if (conflict.isPresent())
+            throw new TaskTimeConflictException(subtask.getName(), conflict.get().getId());
 
         final int id = subtask.getId();
         if (subtask.equals(subtasks.get(id))) {
@@ -328,7 +331,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setStatus(calculateEpicStatus(epic));
     }
 
-    public void updateEpicTime(Epic epic) {
+    protected void updateEpicTime(Epic epic) {
         if (epic.getSubtasks().isEmpty()) {
             epic.setStartTime(null);
             epic.setEndTime(null);
@@ -373,5 +376,46 @@ public class InMemoryTaskManager implements TaskManager {
             return false;
         prioritizedTasks.add(task);
         return true;
+    }
+
+    private Optional<Task> checkTaskTimeCollision(Task task) {
+        if (task.getStartTime() == null || task.getDuration() == null)
+            return Optional.empty();
+
+        if (prioritizedTasks.isEmpty())
+            return Optional.empty();
+
+        Comparator<Task> comparatorByTime = (o1, o2) -> {
+            LocalDateTime endTime1 = o1.getEndTime();
+            if (endTime1.isBefore(o2.getStartTime()))
+                return -1;
+            if (o1.getStartTime().isAfter(o2.getEndTime()))
+                return 1;
+            return 0;
+        };
+
+        int left = 0;
+        int right = prioritizedTasks.size() - 1;
+
+        List<Task> list = prioritizedTasks.stream().toList();
+
+        do {
+            int index = (left + right) >>> 1;
+            // System.out.println("index = " + index);
+            Task other = list.get(index);
+            int result = comparatorByTime.compare(task, other);
+            if (result == 0)
+                return Optional.of(other);
+
+            if (result < 0) {
+                right = index - 1;
+            }
+            else {
+                left = index + 1;
+            }
+
+        } while (left <= right);
+
+        return Optional.empty();
     }
 }

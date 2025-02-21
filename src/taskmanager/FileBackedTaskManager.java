@@ -2,6 +2,7 @@ package taskmanager;
 
 import exception.LoadTaskException;
 import exception.ManagerSaveException;
+import exception.TaskTimeConflictException;
 import tasks.*;
 
 import java.io.*;
@@ -21,7 +22,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task addTask(Task task) {
+    public Task addTask(Task task) throws TaskTimeConflictException {
         Task added = super.addTask(task);
         save();
         return added;
@@ -35,7 +36,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Subtask addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) throws TaskTimeConflictException {
         Subtask added = super.addSubtask(subtask);
         save();
         return added;
@@ -84,7 +85,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task) throws TaskTimeConflictException {
         Task updated = super.updateTask(task);
         save();
         return updated;
@@ -98,7 +99,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Subtask updateSubtask(Subtask subtask) {
+    public Subtask updateSubtask(Subtask subtask) throws TaskTimeConflictException {
         Subtask updated = super.updateSubtask(subtask);
         save();
         return updated;
