@@ -79,13 +79,11 @@ public class Subtask extends Task {
             try {
                 LocalDateTime startTime = LocalDateTime.parse(parts.get(5), formatter);
                 subtask.setStartTime(startTime);
-            }
-            catch (DateTimeParseException ignored) { }
+            } catch (DateTimeParseException ignored) { }
             try {
                 Duration duration = Duration.ofMinutes(Integer.parseInt(parts.get(6)));
                 subtask.setDuration(duration);
-            }
-            catch (NumberFormatException ignored) { }
+            } catch (NumberFormatException ignored) { }
             return subtask;
         } catch (IllegalArgumentException e) {
             throw new LoadTaskException("Неподдерживаемый формат строки: " + String.join(",", parts));
