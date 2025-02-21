@@ -105,7 +105,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return updated;
     }
 
-    protected void save() throws ManagerSaveException {
+    protected void save() {
         final String title = "type, id, name, description, status, links, start_time, [end_time,] duration\n";
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(path.toFile(), false)) {
@@ -126,7 +126,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public static FileBackedTaskManager loadFromFile(Path path) throws LoadTaskException {
+    public static FileBackedTaskManager loadFromFile(Path path) {
 
         FileBackedTaskManager manager = new FileBackedTaskManager(path);
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile(), StandardCharsets.UTF_8))) {
