@@ -409,8 +409,7 @@ public class InMemoryTaskManager implements TaskManager {
 
             if (result < 0) {
                 right = index - 1;
-            }
-            else {
+            } else {
                 left = index + 1;
             }
 
