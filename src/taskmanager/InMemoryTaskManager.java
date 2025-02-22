@@ -32,9 +32,8 @@ public class InMemoryTaskManager implements TaskManager {
     public Task addTask(Task task) throws TaskTimeConflictException {
         if (task == null)
             return null;
-        Optional<Task> conflict = checkTaskTimeCollision(task);
-        if (conflict.isPresent())
-            throw new TaskTimeConflictException(task.getName(), conflict.get().getId());
+
+        checkTaskTimeCollision(task);
 
         task.setId(nextId());
         return addTaskImpl(task);
@@ -70,9 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null)
             return null;
 
-        Optional<Task> conflict = checkTaskTimeCollision(subtask);
-        if (conflict.isPresent())
-            throw new TaskTimeConflictException(subtask.getName(), conflict.get().getId());
+        checkTaskTimeCollision(subtask);
 
         subtask.setId(nextId());
         return addSubtaskImpl(subtask);
@@ -236,9 +233,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task updateTask(Task task) throws TaskTimeConflictException {
-        Optional<Task> conflict = checkTaskTimeCollision(task);
-        if (conflict.isPresent())
-            throw new TaskTimeConflictException(task.getName(), conflict.get().getId());
+        checkTaskTimeCollision(task);
 
         Task old = tasks.replace(task.getId(), task);
         if (old == null) {
@@ -275,10 +270,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask updateSubtask(Subtask subtask) throws TaskTimeConflictException {
-
-        Optional<Task> conflict = checkTaskTimeCollision(subtask);
-        if (conflict.isPresent())
-            throw new TaskTimeConflictException(subtask.getName(), conflict.get().getId());
+        checkTaskTimeCollision(subtask);
 
         final int id = subtask.getId();
         if (subtask.equals(subtasks.get(id))) {
@@ -378,12 +370,12 @@ public class InMemoryTaskManager implements TaskManager {
         return true;
     }
 
-    private Optional<Task> checkTaskTimeCollision(Task task) {
+    private void checkTaskTimeCollision(Task task) throws TaskTimeConflictException {
         if (task.getStartTime() == null || task.getDuration() == null)
-            return Optional.empty();
+            return;
 
         if (prioritizedTasks.isEmpty())
-            return Optional.empty();
+            return;
 
         Comparator<Task> comparatorByTime = (o1, o2) -> {
             LocalDateTime endTime1 = o1.getEndTime();
@@ -405,7 +397,7 @@ public class InMemoryTaskManager implements TaskManager {
             Task other = list.get(index);
             int result = comparatorByTime.compare(task, other);
             if (result == 0)
-                return Optional.of(other);
+                throw new TaskTimeConflictException(task.getName(), other.getId());
 
             if (result < 0) {
                 right = index - 1;
@@ -414,7 +406,5 @@ public class InMemoryTaskManager implements TaskManager {
             }
 
         } while (left <= right);
-
-        return Optional.empty();
     }
 }
