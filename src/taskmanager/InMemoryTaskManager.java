@@ -19,6 +19,15 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Epic> epics;
     protected final Map<Integer, Subtask> subtasks;
 
+    protected static Comparator<Task> comparatorByTime = (o1, o2) -> {
+        LocalDateTime endTime1 = o1.getEndTime();
+        if (endTime1.isBefore(o2.getStartTime()))
+            return -1;
+        if (o1.getStartTime().isAfter(o2.getEndTime()))
+            return 1;
+        return 0;
+    };
+
     public InMemoryTaskManager() {
         uniqueId = 0;
         tasks = new HashMap<>();
@@ -376,15 +385,6 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (prioritizedTasks.isEmpty())
             return;
-
-        Comparator<Task> comparatorByTime = (o1, o2) -> {
-            LocalDateTime endTime1 = o1.getEndTime();
-            if (endTime1.isBefore(o2.getStartTime()))
-                return -1;
-            if (o1.getStartTime().isAfter(o2.getEndTime()))
-                return 1;
-            return 0;
-        };
 
         int left = 0;
         int right = prioritizedTasks.size() - 1;
