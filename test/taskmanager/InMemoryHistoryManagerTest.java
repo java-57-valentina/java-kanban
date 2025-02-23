@@ -35,7 +35,7 @@ class InMemoryHistoryManagerTest {
         final int expected = 5;
 
         for (int i = 0; i < count; i++) {
-            Task task = new Task(i, "Task Name " + i, "Task description " + i, Status.NEW);
+            Task task = new Task(i, "Task Name " + i, "Task description " + i, Status.NEW, null, null);
             manager.add(task);
         }
         List<Task> history = manager.getHistory();
@@ -46,18 +46,23 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void checkUniquenessOfTasksInHistory() {
-        manager.add(new Task(1, "Task1", "Task1 description", Status.NEW));
-        manager.add(new Task(2, "Task2", "Task2 description", Status.NEW));
-        manager.add(new Task(3, "Task3", "Task3 description", Status.NEW));
-        manager.add(new Task(2, "Task2", "Task2 description", Status.IN_PROGRESS));
+        Task task1 = new Task(1, "Task1", "Task1 description", Status.NEW, null, null);
+        Task task2 = new Task(2, "Task2", "Task2 description", Status.NEW, null, null);
+        Task task3 = new Task(3, "Task3", "Task3 description", Status.NEW, null, null);
+        Task task4 = new Task(2, "Task2", "Task2 description", Status.IN_PROGRESS, null, null);
+
+        manager.add(task1);
+        manager.add(task2);
+        manager.add(task3);
+        manager.add(task4);
 
         int expectedSize = 3;
         List<Task> history = manager.getHistory();
         assertEquals(expectedSize, history.size());
 
-        assertTrue(history.contains(new Task(1, "Task1", "Task1 description", Status.NEW)));
-        assertTrue(history.contains(new Task(2, "Task2", "Task2 description", Status.IN_PROGRESS)));
-        assertTrue(history.contains(new Task(3, "Task3", "Task3 description", Status.NEW)));
-        assertFalse(history.contains(new Task(2, "Task2", "Task2 description", Status.NEW)));
+        assertTrue(history.contains(task1));
+        assertFalse(history.contains(task2));
+        assertTrue(history.contains(task3));
+        assertTrue(history.contains(task4));
     }
 }

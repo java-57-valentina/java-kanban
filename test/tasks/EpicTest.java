@@ -3,6 +3,9 @@ package tasks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EpicTest {
@@ -11,14 +14,38 @@ class EpicTest {
     @BeforeEach
     void beforeEach() {
         epic = new Epic(1, "name", "description");
+        epic.setStartTime(LocalDateTime.of(2025, 1, 10, 12, 0));
+        epic.setDuration(Duration.ofMinutes(20));
     }
 
     @Test
     void checkEquals() {
         int id = epic.getId();
         Epic otherEpic = new Epic(id, "name", "description");
+        otherEpic.setStartTime(LocalDateTime.of(2025, 1, 10, 12, 0));
+        otherEpic.setDuration(Duration.ofMinutes(20));
 
         assertEquals(epic, otherEpic);
+    }
+
+    @Test
+    void checkNotEquals1() {
+        int id = epic.getId();
+        Epic otherEpic = new Epic(id, "name", "description");
+        otherEpic.setStartTime(LocalDateTime.of(2025, 1, 10, 12, 20));
+        otherEpic.setDuration(Duration.ofMinutes(20));
+
+        assertNotEquals(epic, otherEpic);
+    }
+
+    @Test
+    void checkNotEquals2() {
+        int id = epic.getId();
+        Epic otherEpic = new Epic(id, "name", "description");
+        otherEpic.setStartTime(LocalDateTime.of(2025, 1, 10, 12, 0));
+        otherEpic.setDuration(Duration.ofMinutes(10));
+
+        assertNotEquals(epic, otherEpic);
     }
 
     @Test

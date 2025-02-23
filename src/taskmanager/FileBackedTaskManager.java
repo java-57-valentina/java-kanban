@@ -2,11 +2,21 @@ package taskmanager;
 
 import exception.LoadTaskException;
 import exception.ManagerSaveException;
-import tasks.*;
+import exception.TaskTimeConflictException;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+import tasks.TaskType;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -18,7 +28,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task addTask(Task task) {
+    public Task addTask(Task task) throws TaskTimeConflictException {
         Task added = super.addTask(task);
         save();
         return added;
@@ -32,7 +42,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Subtask addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) throws TaskTimeConflictException {
         Subtask added = super.addSubtask(subtask);
         save();
         return added;
@@ -81,7 +91,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task) throws TaskTimeConflictException {
         Task updated = super.updateTask(task);
         save();
         return updated;
@@ -95,34 +105,34 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Subtask updateSubtask(Subtask subtask) {
+    public Subtask updateSubtask(Subtask subtask) throws TaskTimeConflictException {
         Subtask updated = super.updateSubtask(subtask);
         save();
         return updated;
     }
 
-    protected void save() throws ManagerSaveException {
-        final String title = "type, id, name, description, status, links\n";
+    protected void save() {
+        final String title = "type, id, name, description, status, links, start_time, [end_time,] duration\n";
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(path.toFile(), false)) {
 
             fileOutputStream.write(title.getBytes(StandardCharsets.UTF_8));
 
             for (Task item : tasks.values()) {
-                fileOutputStream.write(item.toString().getBytes(StandardCharsets.UTF_8));
+                fileOutputStream.write(item.toLine().getBytes(StandardCharsets.UTF_8));
             }
             for (Task item : epics.values()) {
-                fileOutputStream.write(item.toString().getBytes(StandardCharsets.UTF_8));
+                fileOutputStream.write(item.toLine().getBytes(StandardCharsets.UTF_8));
             }
             for (Task item : subtasks.values()) {
-                fileOutputStream.write(item.toString().getBytes(StandardCharsets.UTF_8));
+                fileOutputStream.write(item.toLine().getBytes(StandardCharsets.UTF_8));
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось сохранить данные в файл '" + path.getFileName() + "'");
         }
     }
 
-    public static FileBackedTaskManager loadFromFile(Path path) throws LoadTaskException {
+    public static FileBackedTaskManager loadFromFile(Path path) {
 
         FileBackedTaskManager manager = new FileBackedTaskManager(path);
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile(), StandardCharsets.UTF_8))) {
@@ -149,73 +159,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private static Task fromString(String line) throws LoadTaskException {
-        String[] parts = line.split(", ");
-        if (parts.length == 0 || line.isBlank())
+        List<String> parts = Arrays.stream(line.split(",")).map(String::trim).collect(Collectors.toList());
+
+        if (parts.isEmpty() || line.isBlank())
             throw new LoadTaskException("Неверный формат строки для десериализации задачи");
 
         TaskType taskType;
         try {
-            taskType = TaskType.valueOf(parts[0]);
+            taskType = TaskType.valueOf(parts.get(0));
         } catch (IllegalArgumentException e) {
-            throw new LoadTaskException("Неподдерживаемый тип задачи " + parts[0]);
+            throw new LoadTaskException("Неподдерживаемый тип задачи " + parts.get(0));
         }
 
+        parts.remove(0);
         switch (taskType) {
             case TASK -> {
-                return taskFromString(parts);
+                return Task.fromLine(parts);
             }
             case EPIC -> {
-                return epicFromString(parts);
+                return Epic.fromLine(parts);
             }
             case SUBTASK -> {
-                return subtaskFromString(parts);
+                return Subtask.fromLine(parts);
             }
             default -> throw new LoadTaskException("Неподдерживаемый тип задачи " + taskType);
-        }
-    }
-
-    private static Subtask subtaskFromString(String[] parts) throws LoadTaskException {
-        if (parts.length < 6)
-            throw new LoadTaskException("Неверный формат строки");
-
-        try {
-            int id = Integer.parseInt(parts[1]);
-            int epicId = Integer.parseInt(parts[5]);
-            String name = parts[2];
-            String desk = parts[3];
-            Status status = Status.valueOf(parts[4]);
-            return new Subtask(id, name, desk, status, epicId);
-        } catch (IllegalArgumentException e) {
-            throw new LoadTaskException("Неподдерживаемый формат строки: " + String.join(",", parts));
-        }
-    }
-
-    private static Epic epicFromString(String[] parts) throws LoadTaskException {
-        if (parts.length < 4)
-            throw new LoadTaskException("Неверный формат строки");
-
-        try {
-            int id = Integer.parseInt(parts[1]);
-            String name = parts[2];
-            String desk = parts[3];
-            return new Epic(id, name, desk);
-        } catch (IllegalArgumentException e) {
-            throw new LoadTaskException("Неподдерживаемый формат строки: " + String.join(",", parts));
-        }
-    }
-
-    private static Task taskFromString(String[] parts) throws LoadTaskException {
-        if (parts.length < 5)
-            throw new LoadTaskException("Неверный формат строки");
-
-        try {
-            int id = Integer.parseInt(parts[1]);
-            String name = parts[2];
-            String desk = parts[3];
-            Status status = Status.valueOf(parts[4]);
-            return new Task(id, name, desk, status);
-        } catch (IllegalArgumentException e) {
-            throw new LoadTaskException("Неподдерживаемый формат строки: " + String.join(",", parts));
         }
     }
 }

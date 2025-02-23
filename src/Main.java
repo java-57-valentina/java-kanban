@@ -1,3 +1,4 @@
+import exception.TaskTimeConflictException;
 import taskmanager.Managers;
 import taskmanager.TaskManager;
 import tasks.Epic;
@@ -6,6 +7,8 @@ import tasks.Subtask;
 import tasks.Task;
 
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Main {
@@ -16,21 +19,59 @@ public class Main {
         if (manager.getTasks().isEmpty()) {
             System.out.println("Создание объектов ...");
 
-            manager.addTask(new Task("Выгулять собаку", "взять с собой пакетики", Status.NEW));
-            manager.addTask(new Task("Покормить собаку", "и угостить запеканкой", Status.NEW));
-            manager.addTask(new Task("Купить подарки друзьям", "", Status.NEW));
+            Task task1 = new Task("Выгулять собаку", "взять с собой пакетики", Status.NEW,
+                    LocalDateTime.of(2025, 1, 10, 8, 0),
+                    Duration.ofMinutes(60));
+            try {
+                manager.addTask(task1);
+            } catch (TaskTimeConflictException e) {
+                System.err.println(e.getMessage());
+            }
+
+            Task task2 = new Task("Покормить собаку", "и угостить запеканкой", Status.NEW,
+                    LocalDateTime.of(2025, 1, 10, 9, 10),
+                    Duration.ofMinutes(60));
+            try {
+                manager.addTask(task2);
+            } catch (TaskTimeConflictException e) {
+                System.err.println(e.getMessage());
+            }
 
             Epic epic1 = manager.addEpic(new Epic("Убраться на столе", "на рабочем"));
             Epic epic2 = manager.addEpic(new Epic("Выполнить ФЗ спринта", "качественно"));
 
-            manager.addSubtask(new Subtask("Убрать лишние вещи", "по местам", Status.NEW, epic1.getId()));
-            manager.addSubtask(new Subtask("Протереть пыль", "", Status.NEW, epic1.getId()));
-            manager.addSubtask(new Subtask("Написать код", "не отвлекаться", Status.NEW, epic2.getId()));
+            Subtask su1 = new Subtask("Убрать лишние вещи", "по местам", Status.NEW, epic1.getId(),
+                    LocalDateTime.of(2025, 2, 18, 12, 0),
+                    Duration.ofMinutes(20));
+            Subtask su2 = new Subtask("Протереть пыль", "", Status.NEW, epic1.getId(),
+                    LocalDateTime.of(2025, 1, 10, 11, 0),
+                    Duration.ofMinutes(20));
+            Subtask su3 = new Subtask("Написать код", "не отвлекаться", Status.NEW, epic2.getId(),
+                    LocalDateTime.of(2025, 2, 11, 12, 0),
+                    Duration.ofMinutes(20));
+
+            try {
+                manager.addSubtask(su1);
+                manager.addSubtask(su2);
+                manager.addSubtask(su3);
+            } catch (TaskTimeConflictException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        Task task2 = new Task("Важный звонок", "", Status.NEW,
+                LocalDateTime.of(2025, 1, 10, 9, 30),
+                Duration.ofMinutes(30));
+        try {
+            manager.addTask(task2);
+        } catch (TaskTimeConflictException e) {
+            System.err.println(e.getMessage());
         }
 
         printTasks(manager.getTasks(), "Задачи", manager);
         printTasks(manager.getEpics(), "Эпики", manager);
         printTasks(manager.getSubtasks(), "Подзадачи", manager);
+        printTasks(manager.getPrioritizedTasks(), "Список задач по приоритету", manager);
     }
 
     private static void printTasks(List<? extends Task> list, String title, TaskManager manager) {
